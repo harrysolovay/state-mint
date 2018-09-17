@@ -1,12 +1,5 @@
 {
-  "env": {
-    "browser": true,
-    "es6": true
-  },
   "parser": "babel-eslint",
-  "globals": {
-    "ENV": true
-  },
   "extends": [
     "react-app",
     "plugin:flowtype/recommended"
@@ -16,16 +9,13 @@
     "flowtype",
     "flowtype-errors"
   ],
-  "parserOptions": {
-    "sourceType": "module"
-  },
   "rules": {
-    "indent": [1, 2],
-    "quotes": [1, "single"],
-    "semi": [1, "never"],
+    "indent": [ 1, 2 ],
+    "quotes": [ 1, "single" ],
+    "semi": [ 1, "never" ],
     "flowtype/no-types-missing-file-annotation": 0,
     "flowtype-errors/show-errors": 1,
     "flowtype-errors/show-warnings": 1,
-    "jsx-a11y/href-no-hash": "off"
+    "jsx-a11y/href-no-hash": 0
   }
 }
