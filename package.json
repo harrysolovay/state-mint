@@ -1,0 +1,59 @@
+{
+  "name": "state-mint",
+  "description": "an intuitive, yet powerful state layer that keeps your project fresh 🌿",
+  "author": "Harry Solovay <harrysolovay@gmail.com> (harrysolovay.com)",
+  "version": "0.0.1",
+  "license": "MIT",
+  "main": "lib/state-mint.cjs.js",
+  "module": "lib/state-mint.es.js",
+  "files": [
+    "lib"
+  ],
+  "repository": "https://github.com/harrysolovay/state-mint",
+  "keywords": [
+    "statemint",
+    "state",
+    "mint",
+    "persistent",
+    "data",
+    "store",
+    "container",
+    "context",
+    "management"
+  ],
+  "peerDependencies": {
+    "react": "^16.3.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.0.0",
+    "@babel/core": "^7.0.0",
+    "@babel/plugin-proposal-class-properties": "^7.0.0",
+    "@babel/plugin-syntax-object-rest-spread": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "@babel/preset-flow": "^7.0.0",
+    "@babel/preset-react": "^7.0.0",
+    "babel-eslint": "^9.0.0",
+    "eslint": "^5.5.0",
+    "eslint-config-react-app": "^2.1.0",
+    "eslint-plugin-flowtype": "^2.50.0",
+    "eslint-plugin-flowtype-errors": "^3.6.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.1.1",
+    "eslint-plugin-react": "^7.11.1",
+    "flow-bin": "^0.80.0",
+    "flow-copy-source": "^2.0.2",
+    "rimraf": "^2.6.2",
+    "rollup": "^0.65.0",
+    "rollup-plugin-babel": "^4.0.3",
+    "rollup-plugin-eslint": "^5.0.0"
+  },
+  "scripts": {
+    "clean": "rimraf lib",
+    "prestart": "npm run clean",
+    "start": "rollup -c -w",
+    "demo": "npm run start --prefix demo",
+    "prebuild": "npm run clean",
+    "build": "rollup -c",
+    "prepublish": "npm run build"
+  }
+}
