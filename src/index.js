@@ -6,11 +6,12 @@ import React, {
 } from 'react'
 
 import StateMintError, {
-  PERSIST_METHOD_REFERENCE_ERROR,
+  PERSIST_STRATEGY_MISSING,
 } from './errors'
 
 import {
-  rescope
+  rescope,
+  PersistenceMethods,
 } from './utilities'
 
 const {
@@ -48,12 +49,12 @@ export default (storesOrStoreKeys) => (WrapTarget) => (
 
             Store.prototype.setState = (updater, callback) => {
 
-              const newStoreState = typeof updater === 'function'
+              const newState = typeof updater === 'function'
                 ? updater(this.state[storeKey].state)
                 : updater
 
-              if(this.state[storeKey].saveState) {
-                this.state[storeKey].saveState(newStoreState)
+              if(this.state[storeKey].persistence.save) {
+                this.state[storeKey].persistence.save(newState)
               }
 
               return this.setState((lastState) => ({
@@ -62,7 +63,7 @@ export default (storesOrStoreKeys) => (WrapTarget) => (
                   ...lastState[storeKey],
                   state: {
                     ...lastState[storeKey].state,
-                    ...newStoreState,
+                    ...newState,
                   }
                 },
               }), () => {
@@ -75,45 +76,44 @@ export default (storesOrStoreKeys) => (WrapTarget) => (
 
             this.state[storeKey] = new Store()
 
-            if(this.state[storeKey].persist) {
+            const { persistence } = this.state[storeKey]
 
-              const persistMethod = this.state[storeKey].persist[0]
-              if(!persistMethod) {
+            if(persistence) {
+
+              const { strategy, fromState, toState } = persistence
+
+              if(!strategy) {
                 throw new StateMintError(
-                  PERSIST_METHOD_REFERENCE_ERROR,
+                  PERSIST_STRATEGY_MISSING,
                   storeKey,
                 )
               }
 
-              Object.assign(this.state[storeKey], {
+              const persistenceMethods = new PersistenceMethods(strategy)
 
-                saveState: (state) => {
-                  persistMethod.setItem(
-                    storeKey,
-                    JSON.stringify(state)
-                  )
-                },
-
-                retrieveState: () => {
-                  return JSON.parse(
-                    persistMethod.getItem(
-                      storeKey
-                    )
-                  )
-                },
-
-              })
-
-              const retrievedState = this.state[storeKey].retrieveState()
-              if(retrievedState) {
-                this.state[storeKey].state = retrievedState
+              this.state[storeKey].persistence.save = (newState) => {
+                persistenceMethods.set(
+                  storeKey,
+                  fromState
+                    ? fromState(newState)
+                    : newState
+                )
               }
+
+              persistenceMethods.get(storeKey, (data) => {
+                if(data) {
+                  this.state[storeKey].state = toState
+                    ? toState(data)
+                    : data
+                }
+              })
 
             }
 
             if (!this.state[storeKey].state) {
               this.state[storeKey].state = {}
             }
+
           }
         }
 

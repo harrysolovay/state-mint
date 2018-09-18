@@ -19,6 +19,14 @@ export default {
   external: [
     ...Object.keys(pkg.dependencies || {}),
     ...Object.keys(pkg.peerDependencies || {}),
+
+    '@babel/runtime/helpers/inheritsLoose',
+    '@babel/runtime/helpers/assertThisInitialized',
+    '@babel/runtime/helpers/defineProperty',
+    '@babel/runtime/helpers/extends',
+    '@babel/runtime/helpers/wrapNativeSuper',
+    '@babel/runtime/regenerator',
+    '@babel/runtime/helpers/asyncToGenerator',
   ],
 
   plugins: [
@@ -26,7 +34,8 @@ export default {
     eslint(),
 
     babel({
-      exclude: 'node_modules/**'
+      exclude: 'node_modules/**',
+      runtimeHelpers: true,
     }),
 
   ],
