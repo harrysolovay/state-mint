@@ -60,13 +60,14 @@ const provide = (WrapTarget, stores) => (
             return Promise.resolve()
           }
 
+          // TODO: rewrap in way that avoids setState promise w/in a promise
           // React.Component.prototype.setState returns Promise
           // ... we don't want to defy expectations
           return Promise.resolve().then(() => {
 
             // two state 'setters'
             // unmounted) normal assignment
-            // mounted) works React.Component.setState
+            // mounted) works with React.Component.setState
             return !this.mounted
 
               ? (() => {
