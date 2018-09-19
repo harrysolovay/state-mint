@@ -13,9 +13,12 @@ export default class Account {
 
     strategy: window.localStorage,
 
+    // make so you don't need to pass state
+    // check if mounted in setState
+    
     fromState: (state) => {
-      const { loggedIn, username, bio } = state
-      return { loggedIn, username, bio }
+      const { bioShowing, ...user } = state
+      return user
     },
 
     toState: (persistedData) => ({
@@ -30,7 +33,7 @@ export default class Account {
       ...lastState,
       loggedIn: true,
       username: 'hsolvz',
-      bio: 'I really like StateMint!',
+      bio: 'I really like State Mint!',
     }))
   }
 

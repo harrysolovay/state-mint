@@ -1,5 +1,6 @@
 import pkg from './package.json'
 import { eslint } from 'rollup-plugin-eslint'
+import resolve from 'rollup-plugin-node-resolve'
 import babel from 'rollup-plugin-babel'
 
 export default {
@@ -32,6 +33,8 @@ export default {
   plugins: [
 
     eslint(),
+
+    resolve(),
 
     babel({
       exclude: 'node_modules/**',

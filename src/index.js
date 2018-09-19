@@ -7,124 +7,137 @@ import React, {
 
 import StateMintError, {
   PERSIST_STRATEGY_MISSING,
-} from './errors'
+} from '~/errors'
 
 import {
-  rescope,
-  PersistenceMethods,
-} from './utilities'
+  StoreSubgroup,
+  Persister,
+} from '~/utilities'
 
 const {
   Provider,
   Consumer,
 } = createContext()
 
-export default (storesOrStoreKeys) => (WrapTarget) => (
+const provide = (WrapTarget, keys) => (props) => (
+  <Consumer>
+    {(stores) => (
+      <WrapTarget
+        { ...new StoreSubgroup(stores, keys) }
+        { ...props }
+      />
+    )}
+  </Consumer>
+)
 
-  // swap out with better typechecking
-  Array.isArray(storesOrStoreKeys)
+const consume = (WrapTarget, stores) => (
+  class extends Component {
 
-    ? (props) => (
-      <Consumer>
-        {(stores) => (
-          <WrapTarget
-            stores={ rescope(stores, storesOrStoreKeys) }
-            { ...props }
-          />
-        )}
-      </Consumer>
-    )
+    state = {}
+    mounted = false
 
-    : (
-      class extends Component {
+    constructor () {
+      super()
 
-        state = {}
+      for (let storeKey in stores) {
 
-        constructor () {
-          super()
+        const Store = stores[storeKey]
 
-          for (let storeKey in storesOrStoreKeys) {
+        Store.prototype.setState = (updater, callback) => {
 
-            const Store = storesOrStoreKeys[storeKey]
+          const newState = typeof updater === 'function'
+            ? updater(this.state[storeKey].state)
+            : updater
 
-            Store.prototype.setState = (updater, callback) => {
-
-              const newState = typeof updater === 'function'
-                ? updater(this.state[storeKey].state)
-                : updater
-
-              if(this.state[storeKey].persistence.save) {
-                this.state[storeKey].persistence.save(newState)
-              }
-
-              return this.setState((lastState) => ({
-                ...lastState,
-                [storeKey]: {
-                  ...lastState[storeKey],
-                  state: {
-                    ...lastState[storeKey].state,
-                    ...newState,
-                  }
-                },
-              }), () => {
-                if (callback) {
-                  return callback()
-                }
-              })
-
-            }
-
-            this.state[storeKey] = new Store()
-
-            const { persistence } = this.state[storeKey]
-
-            if(persistence) {
-
-              const { strategy, fromState, toState } = persistence
-
-              if(!strategy) {
-                throw new StateMintError(
-                  PERSIST_STRATEGY_MISSING,
-                  storeKey,
-                )
-              }
-
-              const persistenceMethods = new PersistenceMethods(strategy)
-
-              this.state[storeKey].persistence.save = (newState) => {
-                persistenceMethods.set(
-                  storeKey,
-                  fromState
-                    ? fromState(newState)
-                    : newState
-                )
-              }
-
-              persistenceMethods.get(storeKey, (data) => {
-                if(data) {
-                  this.state[storeKey].state = toState
-                    ? toState(data)
-                    : data
-                }
-              })
-
-            }
-
-            if (!this.state[storeKey].state) {
-              this.state[storeKey].state = {}
-            }
-
+          if(this.state[storeKey].persistence.save) {
+            this.state[storeKey].persistence.save(newState)
           }
+
+          return this.setState((lastState) => ({
+            ...lastState,
+            [storeKey]: {
+              ...lastState[storeKey],
+              state: {
+                ...lastState[storeKey].state,
+                ...newState,
+              }
+            },
+          }), () => {
+            if (callback) {
+              return callback()
+            }
+          })
+
         }
 
-        render () {
-          return (
-            <Provider value={ this.state }>
-              <WrapTarget { ...this.props } />
-            </Provider>
-          )
+        this.state[storeKey] = new Store()
+
+        const { persistence } = this.state[storeKey]
+
+        if(persistence) {
+
+          const { strategy, fromState, toState } = persistence
+
+          if(!strategy) {
+            throw new StateMintError(
+              PERSIST_STRATEGY_MISSING,
+              storeKey,
+            )
+          }
+
+          const persistenceMethods = new Persister(strategy)
+
+          this.state[storeKey].persistence.save = (newState) => {
+            persistenceMethods.set(
+              storeKey,
+              fromState
+                ? fromState(newState)
+                : newState
+            )
+          }
+
+          persistenceMethods.get(storeKey, (data) => {
+
+            const retrieved = toState
+              ? toState(data)
+              : data
+
+            if(data) {
+              if(this.mounted) {
+                this.state[storeKey].setState(() => retrieved)
+              } else {
+                this.state[storeKey].state = retrieved
+              }
+            }
+          })
+
+        }
+
+        if (!this.state[storeKey].state) {
+          this.state[storeKey].state = {}
         }
 
       }
-    )
+    }
+
+    render () {
+      return (
+        <Provider value={ this.state }>
+          <WrapTarget { ...this.props } />
+        </Provider>
+      )
+    }
+
+    componentDidMount () {
+      this.mounted = true
+    }
+
+  }
+)
+
+export default (storesOrStoreKeys) => (WrapTarget) => (
+  // swap out with better typechecking
+  Array.isArray(storesOrStoreKeys)
+    ? provide(WrapTarget, storesOrStoreKeys)
+    : consume(WrapTarget, storesOrStoreKeys)
 )
