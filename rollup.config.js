@@ -20,7 +20,7 @@ export default {
   external: [
     ...Object.keys(pkg.dependencies || {}),
     ...Object.keys(pkg.peerDependencies || {}),
-
+    // suppress `babel-runtime`-related errors
     '@babel/runtime/helpers/inheritsLoose',
     '@babel/runtime/helpers/assertThisInitialized',
     '@babel/runtime/helpers/defineProperty',

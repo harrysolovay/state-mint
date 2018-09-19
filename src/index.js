@@ -19,7 +19,7 @@ const {
   Consumer,
 } = createContext()
 
-const provide = (WrapTarget, keys) => (props) => (
+const consume = (WrapTarget, keys) => (props) => (
   <Consumer>
     {(stores) => (
       <WrapTarget
@@ -30,7 +30,7 @@ const provide = (WrapTarget, keys) => (props) => (
   </Consumer>
 )
 
-const consume = (WrapTarget, stores) => (
+const provide = (WrapTarget, stores) => (
   class extends Component {
 
     state = {}
@@ -45,27 +45,62 @@ const consume = (WrapTarget, stores) => (
 
         Store.prototype.setState = (updater, callback) => {
 
+          // avoid error-throwing operations if state is undefined
+          if (!this.state[storeKey].state) {
+            this.state[storeKey].state = {}
+          }
+
+          // get new state
           const newState = typeof updater === 'function'
             ? updater(this.state[storeKey].state)
             : updater
 
-          if(this.state[storeKey].persistence.save) {
-            this.state[storeKey].persistence.save(newState)
+          // avoid unnecessary operations
+          if (JSON.stringify(this.state[storeKey.state]) === JSON.stringify(newState)) {
+            return Promise.resolve()
           }
 
-          return this.setState((lastState) => ({
-            ...lastState,
-            [storeKey]: {
-              ...lastState[storeKey],
-              state: {
-                ...lastState[storeKey].state,
-                ...newState,
-              }
-            },
-          }), () => {
+          // React.Component.prototype.setState returns Promise
+          // ... we don't want to defy expectations
+          return Promise.resolve().then(() => {
+
+            // two state 'setters'
+            // unmounted) normal assignment
+            // mounted) works React.Component.setState
+            return !this.mounted
+
+              ? (() => {
+                this.state = {
+                  ...this.state,
+                  [storeKey]: {
+                    ...this.state[storeKey],
+                    state: {
+                      ...this.state[storeKey].state,
+                      ...newState
+                    }
+                  }
+                }
+              })()
+
+              : this.setState((lastState) => ({
+                ...lastState,
+                [storeKey]: {
+                  ...lastState[storeKey],
+                  state: {
+                    ...lastState[storeKey].state,
+                    ...newState,
+                  }
+                },
+              }))
+
+          }).then(() => {
+            if (this.state[storeKey].persistence.save) {
+              this.state[storeKey].persistence.save(newState)
+            }
             if (callback) {
               return callback()
             }
+            return
           })
 
         }
@@ -87,6 +122,12 @@ const consume = (WrapTarget, stores) => (
 
           const persistenceMethods = new Persister(strategy)
 
+          // persistenceMethods.remove(storeKey)
+
+          // this.state[storeKey].setState({
+          //   count: 100
+          // })
+
           this.state[storeKey].persistence.save = (newState) => {
             persistenceMethods.set(
               storeKey,
@@ -103,20 +144,12 @@ const consume = (WrapTarget, stores) => (
               : data
 
             if(data) {
-              if(this.mounted) {
-                this.state[storeKey].setState(() => retrieved)
-              } else {
-                this.state[storeKey].state = retrieved
-              }
+              this.state[storeKey].setState(() => retrieved)
             }
+            
           })
 
         }
-
-        if (!this.state[storeKey].state) {
-          this.state[storeKey].state = {}
-        }
-
       }
     }
 
@@ -138,6 +171,6 @@ const consume = (WrapTarget, stores) => (
 export default (storesOrStoreKeys) => (WrapTarget) => (
   // swap out with better typechecking
   Array.isArray(storesOrStoreKeys)
-    ? provide(WrapTarget, storesOrStoreKeys)
-    : consume(WrapTarget, storesOrStoreKeys)
+    ? consume(WrapTarget, storesOrStoreKeys)
+    : provide(WrapTarget, storesOrStoreKeys)
 )
