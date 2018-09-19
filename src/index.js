@@ -11,7 +11,7 @@ import StateMintError, {
 
 import {
   StoreSubgroup,
-  Persister,
+  getPersister,
 } from '~/utilities'
 
 const {
@@ -46,6 +46,7 @@ const provide = (WrapTarget, stores) => (
         Store.prototype.setState = (updater, callback) => {
 
           // avoid error-throwing operations if state is undefined
+          // TODO: ensure points to same memory
           if (!this.state[storeKey].state) {
             this.state[storeKey].state = {}
           }
@@ -60,48 +61,49 @@ const provide = (WrapTarget, stores) => (
             return Promise.resolve()
           }
 
-          // TODO: rewrap in way that avoids setState promise w/in a promise
-          // React.Component.prototype.setState returns Promise
-          // ... we don't want to defy expectations
-          return Promise.resolve().then(() => {
+          // chain the setState & peristence callbacks once for both setters
+          return new Promise((resolve) => {
 
-            // two state 'setters'
-            // unmounted) normal assignment
+            // two state 'setters':
+            // unmounted) direct mutation (allowed within constructor)
             // mounted) works with React.Component.setState
-            return !this.mounted
 
-              ? (() => {
-                this.state = {
-                  ...this.state,
-                  [storeKey]: {
-                    ...this.state[storeKey],
-                    state: {
-                      ...this.state[storeKey].state,
-                      ...newState
-                    }
-                  }
-                }
-              })()
+            if(!this.mounted) {
+              Object.assign(this.state[storeKey].state, newState)
+              resolve()
+            }
 
-              : this.setState((lastState) => ({
+            else {
+              this.setState((lastState) => ({
                 ...lastState,
                 [storeKey]: {
                   ...lastState[storeKey],
                   state: {
                     ...lastState[storeKey].state,
                     ...newState,
-                  }
+                  },
                 },
-              }))
+              }), resolve)
+            }
 
           }).then(() => {
-            if (this.state[storeKey].persistence.save) {
-              this.state[storeKey].persistence.save(newState)
+
+            console.log('from store', this.state[storeKey].state)
+            
+            const { persistence } = this.state[storeKey]
+            if (persistence) {
+              const { fromStore } = persistence
+              persistence.set(
+                storeKey,
+                fromStore
+                  ? fromStore(newState)
+                  : newState
+              )
             }
+
             if (callback) {
               return callback()
             }
-            return
           })
 
         }
@@ -112,7 +114,7 @@ const provide = (WrapTarget, stores) => (
 
         if(persistence) {
 
-          const { strategy, fromState, toState } = persistence
+          const { strategy, options, fromStore, toStore } = persistence
 
           if(!strategy) {
             throw new StateMintError(
@@ -121,33 +123,23 @@ const provide = (WrapTarget, stores) => (
             )
           }
 
-          const persistenceMethods = new Persister(strategy)
+          const persister = getPersister(strategy, options)
+          Object.assign(this.state[storeKey].persistence, persister)
 
-          // persistenceMethods.remove(storeKey)
+          // persister.remove(storeKey)
 
           // this.state[storeKey].setState({
           //   count: 100
           // })
 
-          this.state[storeKey].persistence.save = (newState) => {
-            persistenceMethods.set(
-              storeKey,
-              fromState
-                ? fromState(newState)
-                : newState
-            )
-          }
-
-          persistenceMethods.get(storeKey, (data) => {
-
-            const retrieved = toState
-              ? toState(data)
-              : data
-
+          persister.get(storeKey, (data) => {
             if(data) {
-              this.state[storeKey].setState(() => retrieved)
+              if(toStore) {
+                toStore(data)
+              } else {
+                this.state[storeKey].setState(() => data)
+              }
             }
-            
           })
 
         }

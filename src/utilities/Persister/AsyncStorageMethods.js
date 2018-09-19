@@ -1,4 +1,4 @@
-export default class AsyncStoragePersister {
+export default class AsyncStorageMethods {
 
   constructor(strategy) {
     this.strategy = strategy

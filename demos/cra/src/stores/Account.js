@@ -16,15 +16,17 @@ export default class Account {
     // make so you don't need to pass state
     // check if mounted in setState
     
-    fromState: (state) => {
-      const { bioShowing, ...user } = state
+    fromStore: (state) => {
+      const { bioShowing, ...user } = this.state
       return user
     },
 
-    toState: (persistedData) => ({
-      ...DEFAULT_STATE,
-      ...persistedData,
-    }),
+    toStore: (persistedData) => {
+      this.setState((lastState) => ({
+        ...lastState,
+        ...persistedData,
+      }))
+    },
 
   }
 

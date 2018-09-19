@@ -1,4 +1,4 @@
-export default class CookiePersister {
+export default class CookieMethods {
 
   constructor(strategy, options) {
     this.strategy = strategy

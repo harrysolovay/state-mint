@@ -1,4 +1,4 @@
-export default class SyncStoragePersister {
+export default class SyncStorageMethods {
 
   constructor(strategy) {
     this.strategy = strategy
