@@ -11,7 +11,8 @@ import StateMintError, {
 
 import {
   StoreSubgroup,
-  getPersister,
+  PersistMethods,
+  runningOnNative,
 } from '~/utilities'
 
 const {
@@ -30,114 +31,104 @@ const consume = (WrapTarget, keys) => (props) => (
   </Consumer>
 )
 
-const provide = (WrapTarget, stores) => (
+const provide = (WrapTarget, config) => (
   class extends Component {
 
-    state = {}
+    stores = {}
     mounted = false
 
     constructor () {
       super()
 
-      for (let storeKey in stores) {
+      for (let storeKey in config) {
 
-        const Store = stores[storeKey]
+        const Store = config[storeKey]
 
         Store.prototype.setState = (updater, callback) => {
 
           // avoid error-throwing operations if state is undefined
-          // TODO: ensure points to same memory
-          if (!this.state[storeKey].state) {
-            this.state[storeKey].state = {}
+          if (!this.stores[storeKey].state) {
+            this.stores[storeKey].state = {}
           }
 
           // get new state
           const newState = typeof updater === 'function'
-            ? updater(this.state[storeKey].state)
+            ? updater(this.stores[storeKey].state)
             : updater
 
-          // avoid unnecessary operations
-          if (JSON.stringify(this.state[storeKey.state]) === JSON.stringify(newState)) {
-            return Promise.resolve()
+          // avoid unnecessary operations if store data unchanged
+          if (JSON.stringify(this.stores[storeKey.state]) === JSON.stringify(newState)) {
+            return callback && callback()
           }
 
-          // chain the setState & peristence callbacks once for both setters
-          return new Promise((resolve) => {
+          Object.assign(this.stores[storeKey].state, newState)
 
-            // two state 'setters':
-            // unmounted) direct mutation (allowed within constructor)
-            // mounted) works with React.Component.setState
+          // trigger re-render
+          if (this.mounted) this.setState({})
+          
+          // if defined
+          const { persist } = this.stores[storeKey]
 
-            if(!this.mounted) {
-              Object.assign(this.state[storeKey].state, newState)
-              resolve()
-            }
+          // Todo: figure out if state is even referenced in fromStore method
+          // trigger save
+          if (persist) {
+            persist()
+          }
 
-            else {
-              this.setState((lastState) => ({
-                ...lastState,
-                [storeKey]: {
-                  ...lastState[storeKey],
-                  state: {
-                    ...lastState[storeKey].state,
-                    ...newState,
-                  },
-                },
-              }), resolve)
-            }
-
-          }).then(() => {
-
-            console.log('from store', this.state[storeKey].state)
-            
-            const { persistence } = this.state[storeKey]
-            if (persistence) {
-              const { fromStore } = persistence
-              persistence.set(
-                storeKey,
-                fromStore
-                  ? fromStore(newState)
-                  : newState
-              )
-            }
-
-            if (callback) {
-              return callback()
-            }
-          })
+          // TODO: compare & re-write to match React.Component.setState return
+          // ...however, avoid fake Promise response (dead weight)
+          return callback && callback()
 
         }
 
-        this.state[storeKey] = new Store()
+        this.stores[storeKey] = new Store()
 
-        const { persistence } = this.state[storeKey]
+        // get configuration object from instance
+        const { persist } = this.stores[storeKey]
 
-        if(persistence) {
+        if(persist) {
 
-          const { strategy, options, fromStore, toStore } = persistence
+          // get specifics from configuration
+          let { strategy, options, fromStore, toStore } = persist
 
-          if(!strategy) {
-            throw new StateMintError(
-              PERSIST_STRATEGY_MISSING,
-              storeKey,
-            )
+          // accept persist without config (aka. `persist = true`)
+          if (typeof persist === 'Boolean') {
+            // must pass strategy in React Native
+            if (runningOnNative) {
+              throw new StateMintError(
+                PERSIST_STRATEGY_MISSING,
+                storeKey,
+              )
+            } else {
+              // default to localStorage
+              strategy = window.localStorage
+            }
           }
 
-          const persister = getPersister(strategy, options)
-          Object.assign(this.state[storeKey].persistence, persister)
+          // create persist methods ({ set, get, remove })
+          const persistMethods = new PersistMethods(strategy, options)
 
-          // persister.remove(storeKey)
+          // override user-defined persist settings
+          Object.assign(this.stores[storeKey], {
+            // ...with the configured persist save trigger
+            persist: () => {
+              persistMethods.set(
+                storeKey,
+                fromStore
+                  ? fromStore()
+                  : this.stores[storeKey].state
+              )
+            }
+          })
 
-          // this.state[storeKey].setState({
-          //   count: 100
-          // })
+          // persistMethods.remove(storeKey)
 
-          persister.get(storeKey, (data) => {
+          persistMethods.get(storeKey, (data) => {
             if(data) {
               if(toStore) {
                 toStore(data)
               } else {
-                this.state[storeKey].setState(() => data)
+                this.stores[storeKey].setState(data)
               }
             }
           })
@@ -148,7 +139,7 @@ const provide = (WrapTarget, stores) => (
 
     render () {
       return (
-        <Provider value={ this.state }>
+        <Provider value={ this.stores }>
           <WrapTarget { ...this.props } />
         </Provider>
       )

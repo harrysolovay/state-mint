@@ -42,6 +42,19 @@ const Account = ({ stores: { account } }) => (
           />
         </div>
     }
+    <div>
+      <button
+        children='out-of-state toggle'
+        onClick={ account.statelessToggle }
+      />
+      <span
+        children={
+          account.someVar
+            ? 'false'
+            : 'true'
+        }
+      />
+    </div>
   </div>
 )
 

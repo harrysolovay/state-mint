@@ -7,24 +7,26 @@ const DEFAULT_STATE = {
 
 export default class Account {
 
-  state = DEFAULT_STATE
+  state = { ...DEFAULT_STATE }
 
-  persistence = {
+  someVar = false
+
+  persist = {
 
     strategy: window.localStorage,
 
-    // make so you don't need to pass state
-    // check if mounted in setState
-    
-    fromStore: (state) => {
+    fromStore: () => {
+      const { someVar } = this
       const { bioShowing, ...user } = this.state
-      return user
+      return { someVar, ...user }
     },
 
     toStore: (persistedData) => {
+      const { someVar, ...user } = persistedData
+      this.someVar = someVar
       this.setState((lastState) => ({
         ...lastState,
-        ...persistedData,
+        ...user,
       }))
     },
 
@@ -48,6 +50,11 @@ export default class Account {
 
   logOut = () => {
     this.setState(DEFAULT_STATE)
+  }
+
+  statelessToggle = () => {
+    this.someVar = !this.someVar
+    this.persist()
   }
 
 }

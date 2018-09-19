@@ -1,13 +1,8 @@
-export default class CookieMethods {
+export default (strategy, options) => ({
 
-  constructor(strategy, options) {
-    this.strategy = strategy
-    this.options = options
-  }
-
-  set = (key, data, callback) => {
+  set: (key, data, callback) => {
     const stringified = JSON.stringify(data)
-    const { days } = this.options
+    const { days } = options
     if (days) {
       const currentDate = new Date()
       const expirationDate = currentDate.getTime() + days * 24 * 60 * 1000
@@ -15,9 +10,9 @@ export default class CookieMethods {
     }
     document.cookie = `${ key }=${ stringified }${ expires }; path=/`
     if (callback) callback()
-  }
+  },
 
-  get = (key, callback) => {
+  get: (key, callback) => {
     const searchKey = `${ key }=`
     const cookies = document.cookie.split(';')
     for (let key in cookies) {
@@ -34,10 +29,10 @@ export default class CookieMethods {
         if(callback) callback(parsed)
       }
     }
-  }
+  },
 
-  remove = (key) => {
+  remove: (key) => {
     document.cookie = `${ key }=; Max-Age=-99999999;`
-  }
+  },
 
-}
+})
