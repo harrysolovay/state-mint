@@ -1,9 +1,17 @@
-// eventually flow-type
+// @flow
 
 import React, {
   Component,
   createContext,
 } from 'react'
+
+import type {
+  ComponentType
+} from 'react'
+
+import type {
+  StoresType
+} from './types'
 
 import {
   StoreSubgroup,
@@ -21,13 +29,17 @@ import StateMintError, {
 } from '~/errors'
 
 const {
-  Provider,
   Consumer,
+  Provider,
 } = createContext()
 
-const consume = (WrapTarget, keys) => (props) => (
+type WrapTargetType = ComponentType<any>
+
+type consumeConfigType = Array<string>
+
+const consume = (WrapTarget: WrapTargetType, keys: consumeConfigType) => (props: {}) => (
   <Consumer>
-    {(stores) => (
+    {(stores: StoresType) => (
       <WrapTarget
         { ...new StoreSubgroup(stores, keys) }
         { ...props }
@@ -36,8 +48,14 @@ const consume = (WrapTarget, keys) => (props) => (
   </Consumer>
 )
 
-const provide = (WrapTarget, config) => (
-  class extends Component {
+type provideConfigType = {|
+  [string]: Class<any>,
+|}
+
+type ProviderStateType = {||}
+
+const provide = (WrapTarget: WrapTargetType, config: provideConfigType) => (
+  class extends Component<{}, ProviderStateType> {
 
     stores = {}
     mounted = false
@@ -62,7 +80,7 @@ const provide = (WrapTarget, config) => (
             : updater
 
           // avoid unnecessary operations if store data unchanged
-          if (JSON.stringify(this.stores[storeKey.state]) === JSON.stringify(newState)) {
+          if (JSON.stringify(this.stores[storeKey].state) === JSON.stringify(newState)) {
             callback && callback()
           }
 
@@ -84,16 +102,19 @@ const provide = (WrapTarget, config) => (
 
         }
 
+        // instanciate
         this.stores[storeKey] = new Store()
 
-        // get configuration object from instance
+        // get truth / configuration object from instance
         const { persist } = this.stores[storeKey]
 
+        // if defined
         if(persist) {
 
           // get specifics from configuration
           let { strategy, options, fromStore, toStore } = persist
 
+          // can't use one without the other
           if(fromStore || toStore) {
             if(!fromStore) {
               throw new StateMintError(
@@ -171,26 +192,38 @@ const provide = (WrapTarget, config) => (
   }
 )
 
+type configType =
+  | consumeConfigType
+  | provideConfigType
+
+const isConsumeConfig = (inQuestion): boolean %checks => {
+  return Array.isArray(inQuestion)
+}
+
+const isProvideConfig = (inQuestion): boolean %checks => {
+  return Object.prototype.toString.call(inQuestion) === '[object Object]'
+}
+
 // (might as well modulzarize, used twice below)
-const throwWrapTargetError = (key) => {
+const throwWrapTargetError = (key: string) => {
   throw new StateMintError(
     INVALID_WRAP_TARGET,
     key,
   )
 }
 
-export default (configOrKeys) => (WrapTarget) => {
+export default (config: configType) => (WrapTarget: WrapTargetType) => {
 
   const invalidWrapTarget = !isReactComponent(WrapTarget)
 
-  if (Object.prototype.toString.call(configOrKeys) === '[object Object]') {
-    invalidWrapTarget && throwWrapTargetError('storesConfig')
-    return provide(WrapTarget, configOrKeys)
+  if (isConsumeConfig(config)) {
+    invalidWrapTarget && throwWrapTargetError('storeKeys')
+    return consume(WrapTarget, config)
   }
 
-  if (Array.isArray(configOrKeys)) {
-    invalidWrapTarget && throwWrapTargetError('storeKeys')
-    return consume(WrapTarget, configOrKeys)
+  if (isProvideConfig(config)) {
+    invalidWrapTarget && throwWrapTargetError('storesConfig')
+    return provide(WrapTarget, config)
   }
 
   throw new StateMintError(

@@ -1,3 +1,5 @@
+// @flow
+
 import { isRunningOnNative } from '~/utilities'
 
 export const PERSIST_STRATEGY_MISSING = 'PERSIST_METHOD_INVALID'
@@ -8,8 +10,20 @@ export const MISSING_TO_STORE = 'MISSING_TO_STORE'
 export const INVALID_MINT_CONFIG = 'INVALID_MINT_CONFIG'
 export const INVALID_WRAP_TARGET = 'INVALID_WRAP_TARGET'
 
+const errors = {
+  PERSIST_STRATEGY_MISSING,
+  PERSIST_STRATEGY_INVALID,
+  STORE_KEY_INVALID,
+  MISSING_FROM_STORE,
+  MISSING_TO_STORE,
+  INVALID_MINT_CONFIG,
+  INVALID_WRAP_TARGET,
+}
+
+type errorType = $Values<typeof errors>
+
 const generateMessage = (errorNameOrMessage, key) => {
-  switch(errorNameOrMessage) {
+  switch (errorNameOrMessage) {
 
     case PERSIST_STRATEGY_MISSING: {
       const potentialStrategies = isRunningOnNative()
@@ -34,15 +48,14 @@ const generateMessage = (errorNameOrMessage, key) => {
       return `Cannot call 'mint' with supplied arguments; refer to documentation for correct usage.`
 
     case INVALID_WRAP_TARGET: {
-
-      if (key === 'storesConfig') 
-        return `The function returned from calling 'mint({ ...storesConfig })' can only be called with a valid React Component (which will then provide your stores to minted children).`
-      
-      if (key === 'storeKeys')
-        return `The function returned from calling 'mint([ ...storeKeys ])' can only be called with a valid React Component (to which your stores will be connected).`
-
-      // just incase
-      return `The function returned from calling 'mint(arg)' can only be called with a valid React Component.`
+      switch (key) {
+        case 'storesConfig':
+          return `The function returned from calling 'mint({ ...storesConfig })' can only be called with a valid React Component (which will then provide your stores to minted children).`
+        case 'storeKeys':
+          return `The function returned from calling 'mint([ ...storeKeys ])' can only be called with a valid React Component (to which your stores will be connected).`
+        default: // just incase
+          return `The function returned from calling 'mint(arg)' can only be called with a valid React Component.`
+      }
     }
 
     default:
@@ -54,7 +67,7 @@ const generateMessage = (errorNameOrMessage, key) => {
 }
 
 export default class StateMintError extends Error {
-  constructor() {
+  constructor(error: errorType, key?: string) {
     super(
       generateMessage(
         ...arguments

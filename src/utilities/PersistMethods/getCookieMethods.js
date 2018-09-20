@@ -15,7 +15,6 @@ export default (strategy, options={ days: 14 }) => ({
   },
 
   get: (key, callback) => {
-    const jar = {}
     const cookies = document.cookie
       ? document.cookie.split('; ')
       : []

@@ -1,3 +1,9 @@
+// @flow
+
+import type {
+  StoresType
+} from '~/types'
+
 import StateMintError, {
   STORE_KEY_INVALID,
 } from '~/errors'
@@ -6,7 +12,7 @@ export default class StoreSubgroup {
 
   stores = {}
 
-  constructor(stores, limitTo) {
+  constructor(stores: StoresType, limitTo: Array<string>) {
     limitTo
       .filter((key) => {
         const exists = Object
