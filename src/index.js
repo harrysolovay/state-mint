@@ -10,7 +10,7 @@ import type {
 } from 'react'
 
 import type {
-  StoresType
+  storesType
 } from './types'
 
 import {
@@ -31,7 +31,7 @@ import StateMintError, {
 const {
   Consumer,
   Provider,
-} = createContext()
+} = createContext({})
 
 type WrapTargetType = ComponentType<any>
 
@@ -39,7 +39,7 @@ type consumeConfigType = Array<string>
 
 const consume = (WrapTarget: WrapTargetType, keys: consumeConfigType) => (props: {}) => (
   <Consumer>
-    {(stores: StoresType) => (
+    {(stores) => (
       <WrapTarget
         { ...new StoreSubgroup(stores, keys) }
         { ...props }

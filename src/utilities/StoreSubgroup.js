@@ -1,7 +1,7 @@
 // @flow
 
 import type {
-  StoresType
+  storesType
 } from '~/types'
 
 import StateMintError, {
@@ -12,7 +12,7 @@ export default class StoreSubgroup {
 
   stores = {}
 
-  constructor(stores: StoresType, limitTo: Array<string>) {
+  constructor(stores: storesType, limitTo: Array<string>) {
     limitTo
       .filter((key) => {
         const exists = Object
