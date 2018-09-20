@@ -5,15 +5,17 @@ import React, {
   createContext,
 } from 'react'
 
-import StateMintError, {
-  PERSIST_STRATEGY_MISSING,
-} from '~/errors'
-
 import {
   StoreSubgroup,
+  RUNNING_NATIVE,
   PersistMethods,
-  runningOnNative,
 } from '~/utilities'
+
+import StateMintError, {
+  MISSING_FROM_STORE,
+  MISSING_TO_STORE,
+  PERSIST_STRATEGY_MISSING,
+} from '~/errors'
 
 const {
   Provider,
@@ -58,26 +60,23 @@ const provide = (WrapTarget, config) => (
 
           // avoid unnecessary operations if store data unchanged
           if (JSON.stringify(this.stores[storeKey.state]) === JSON.stringify(newState)) {
-            return callback && callback()
+            callback && callback()
           }
 
+          // assign new state without pointing to new memory
           Object.assign(this.stores[storeKey].state, newState)
 
           // trigger re-render
-          if (this.mounted) this.setState({})
+          this.mounted && this.setState({})
           
           // if defined
           const { persist } = this.stores[storeKey]
 
-          // Todo: figure out if state is even referenced in fromStore method
           // trigger save
-          if (persist) {
-            persist()
-          }
+          persist && persist()
 
-          // TODO: compare & re-write to match React.Component.setState return
-          // ...however, avoid fake Promise response (dead weight)
-          return callback && callback()
+          // trigger callback
+          callback && callback()
 
         }
 
@@ -91,16 +90,32 @@ const provide = (WrapTarget, config) => (
           // get specifics from configuration
           let { strategy, options, fromStore, toStore } = persist
 
-          // accept persist without config (aka. `persist = true`)
-          if (typeof persist === 'Boolean') {
+          if(fromStore || toStore) {
+            if(!fromStore) {
+              throw new StateMintError(
+                MISSING_FROM_STORE,
+                storeKey,
+              )
+            }
+            if(!toStore) {
+              throw new StateMintError(
+                MISSING_TO_STORE,
+                storeKey,
+              )
+            }
+          }
+
+          // accept persist as Boolean instead of { ...config }
+          // (aka., setting `persist = true` in class definition)
+          if (typeof persist === 'boolean') {
             // must pass strategy in React Native
-            if (runningOnNative) {
+            if (RUNNING_NATIVE) {
               throw new StateMintError(
                 PERSIST_STRATEGY_MISSING,
                 storeKey,
               )
             } else {
-              // default to localStorage
+              // otherwise, default to localStorage
               strategy = window.localStorage
             }
           }
@@ -153,7 +168,7 @@ const provide = (WrapTarget, config) => (
 )
 
 export default (storesOrStoreKeys) => (WrapTarget) => (
-  // swap out with better typechecking
+  // TODO: swap out with better typechecking
   Array.isArray(storesOrStoreKeys)
     ? consume(WrapTarget, storesOrStoreKeys)
     : provide(WrapTarget, storesOrStoreKeys)

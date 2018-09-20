@@ -6,7 +6,7 @@ export const isFunction = (fn) => (
   fn && {}.toString.call(fn) === '[object Function]'
 )
 
-export const runningOnNative = (
+export const RUNNING_NATIVE = (
   typeof navigator !== 'undefined' &&
   navigator.product === 'ReactNative'
 )
