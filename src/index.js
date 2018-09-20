@@ -72,6 +72,7 @@ const provide = (WrapTarget, config) => (
           // if defined
           const { persist } = this.stores[storeKey]
 
+          // TODO: do this, only if keyword 'state' in Stringified fromState
           // trigger save
           persist && persist()
 
