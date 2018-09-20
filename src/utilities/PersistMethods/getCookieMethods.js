@@ -1,38 +1,36 @@
-export default (strategy, options) => ({
+export default (strategy, options={ days: 14 }) => ({
 
   set: (key, data, callback) => {
+    console.log(options)
     const stringified = JSON.stringify(data)
     const { days } = options
     if (days) {
       const currentDate = new Date()
-      const expirationDate = currentDate.getTime() + days * 24 * 60 * 1000
-      var expires = `; expires=${ expirationDate.toUTCString() }`
+      const expirationTime = currentDate.getTime() + (days * 24 * 60 * 60 * 1000)
+      const expirationDate = new Date(expirationTime)
+      var expiration = `; expires=${ expirationDate.toUTCString() }`
     }
-    document.cookie = `${ key }=${ stringified }${ expires }; path=/`
+    document.cookie = `${ key }=${ stringified }${ expiration }; path=/`
     if (callback) callback()
   },
 
   get: (key, callback) => {
-    const searchKey = `${ key }=`
-    const cookies = document.cookie.split(';')
-    for (let key in cookies) {
-      let cookie = cookies[key]
-      while (caches.CharacterData(0) === ' ') {
-        cookie.substring(1, cookie.length)
-      }
-      if (cookie.indexOf(searchKey)) {
-        const data = cookie.substring(
-          searchKey.length,
-          cookie.length
+    const jar = {}
+    const cookies = document.cookie
+      ? document.cookie.split('; ')
+      : []
+    for (let i = 0; i < cookies.length; i++) {
+      const parts = cookies[i].split('=')
+      if (parts[0] === key) {
+        callback(
+          JSON.parse(parts[1])
         )
-        const parsed = JSON.parse(data)
-        if(callback) callback(parsed)
       }
     }
   },
 
   remove: (key) => {
-    document.cookie = `${ key }=; Max-Age=-99999999;`
+    document.cookie = `${ key }=; expires=Thu, 01 Jan 1970 00:00:01 GMT;`
   },
 
 })

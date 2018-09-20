@@ -1,6 +1,6 @@
 // flow type it!
 
-import getStorageMethods from './getSyncStorageMethods'
+import getStorageMethods from './getStorageMethods'
 import getAsyncStorageMethods from './getAsyncStorageMethods'
 import getSecureStoreMethods from './getSecureStoreMethods'
 import getCookieMethods from './getCookieMethods'
@@ -43,7 +43,7 @@ export default class PersistMethods {
           strategy.getItemAsync &&
           strategy.deleteItemAsync
         ) {
-          const methods = getSecureStoreMethods(strategy)
+          const methods = getSecureStoreMethods(strategy, options)
           Object.assign(this, methods)
           break
         }
@@ -58,7 +58,7 @@ export default class PersistMethods {
 
         // document.cookie
         if(strategy === document.cookie) {
-          const methods = getCookieMethods(strategy)
+          const methods = getCookieMethods(strategy, options)
           Object.assign(this, methods)
           break
         }

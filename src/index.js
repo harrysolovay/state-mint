@@ -7,7 +7,7 @@ import React, {
 
 import {
   StoreSubgroup,
-  RUNNING_NATIVE,
+  isRunningOnNative,
   PersistMethods,
 } from '~/utilities'
 
@@ -109,7 +109,7 @@ const provide = (WrapTarget, config) => (
           // (aka., setting `persist = true` in class definition)
           if (typeof persist === 'boolean') {
             // must pass strategy in React Native
-            if (RUNNING_NATIVE) {
+            if (isRunningOnNative()) {
               throw new StateMintError(
                 PERSIST_STRATEGY_MISSING,
                 storeKey,
@@ -137,8 +137,8 @@ const provide = (WrapTarget, config) => (
           })
 
           // persistMethods.remove(storeKey)
-
           persistMethods.get(storeKey, (data) => {
+            // console.log('should hit', storeKey)
             if(data) {
               if(toStore) {
                 toStore(data)

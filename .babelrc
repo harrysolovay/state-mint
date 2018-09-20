@@ -14,6 +14,7 @@
     "@babel/plugin-transform-runtime",
     "@babel/plugin-proposal-class-properties",
     "@babel/plugin-syntax-object-rest-spread",
+    "@babel/plugin-transform-object-assign",
     ["module-resolver", {
       "root": ".",
       "alias": {

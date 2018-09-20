@@ -1,4 +1,4 @@
-import { RUNNING_NATIVE } from '~/utilities'
+import { isRunningOnNative } from '~/utilities'
 
 export const PERSIST_STRATEGY_MISSING = 'PERSIST_METHOD_INVALID'
 export const PERSIST_STRATEGY_INVALID = 'PERSIST_STRATEGY_INVALID'
@@ -10,7 +10,7 @@ const generateMessage = (errorNameOrMessage, key) => {
   switch(errorNameOrMessage) {
 
     case PERSIST_STRATEGY_MISSING: {
-      const potentialStrategies = RUNNING_NATIVE
+      const potentialStrategies = isRunningOnNative()
         ? 'AsyncStorage or SecureStore'
         : `'cookie' or window.localStorage`
       return `Must assign a valid persistence strategy (such as '${ potentialStrategies }), in '${ key }' store.`
