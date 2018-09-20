@@ -5,6 +5,8 @@ export const PERSIST_STRATEGY_INVALID = 'PERSIST_STRATEGY_INVALID'
 export const STORE_KEY_INVALID = 'STORE_KEY_INVALID'
 export const MISSING_FROM_STORE = 'MISSING_FROM_STORE'
 export const MISSING_TO_STORE = 'MISSING_TO_STORE'
+export const INVALID_MINT_CONFIG = 'INVALID_MINT_CONFIG'
+export const INVALID_WRAP_TARGET = 'INVALID_WRAP_TARGET'
 
 const generateMessage = (errorNameOrMessage, key) => {
   switch(errorNameOrMessage) {
@@ -27,6 +29,21 @@ const generateMessage = (errorNameOrMessage, key) => {
 
     case MISSING_TO_STORE:
       return `Persisted data is mapped from '${ key }' store (with 'persist.fromStore'), but the reverse mapping ('persist.toStore') is undefined.`
+
+    case INVALID_MINT_CONFIG:
+      return `Cannot call 'mint' with supplied arguments; refer to documentation for correct usage.`
+
+    case INVALID_WRAP_TARGET: {
+
+      if (key === 'storesConfig') 
+        return `The function returned from calling 'mint({ ...storesConfig })' can only be called with a valid React Component (which will then provide your stores to minted children).`
+      
+      if (key === 'storeKeys')
+        return `The function returned from calling 'mint([ ...storeKeys ])' can only be called with a valid React Component (to which your stores will be connected).`
+
+      // just incase
+      return `The function returned from calling 'mint(arg)' can only be called with a valid React Component.`
+    }
 
     default:
       return errorNameOrMessage

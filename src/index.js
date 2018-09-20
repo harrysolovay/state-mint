@@ -9,12 +9,15 @@ import {
   StoreSubgroup,
   isRunningOnNative,
   PersistMethods,
+  isReactComponent,
 } from '~/utilities'
 
 import StateMintError, {
   MISSING_FROM_STORE,
   MISSING_TO_STORE,
   PERSIST_STRATEGY_MISSING,
+  INVALID_WRAP_TARGET,
+  INVALID_MINT_CONFIG,
 } from '~/errors'
 
 const {
@@ -168,9 +171,30 @@ const provide = (WrapTarget, config) => (
   }
 )
 
-export default (storesOrStoreKeys) => (WrapTarget) => (
-  // TODO: swap out with better typechecking
-  Array.isArray(storesOrStoreKeys)
-    ? consume(WrapTarget, storesOrStoreKeys)
-    : provide(WrapTarget, storesOrStoreKeys)
-)
+// (might as well modulzarize, used twice below)
+const throwWrapTargetError = (key) => {
+  throw new StateMintError(
+    INVALID_WRAP_TARGET,
+    key,
+  )
+}
+
+export default (configOrKeys) => (WrapTarget) => {
+
+  const invalidWrapTarget = !isReactComponent(WrapTarget)
+
+  if (Object.prototype.toString.call(configOrKeys) === '[object Object]') {
+    invalidWrapTarget && throwWrapTargetError('storesConfig')
+    return provide(WrapTarget, configOrKeys)
+  }
+
+  if (Array.isArray(configOrKeys)) {
+    invalidWrapTarget && throwWrapTargetError('storeKeys')
+    return consume(WrapTarget, configOrKeys)
+  }
+
+  throw new StateMintError(
+    INVALID_MINT_CONFIG
+  )
+
+}
