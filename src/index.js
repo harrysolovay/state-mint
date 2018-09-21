@@ -52,10 +52,9 @@ type provideConfigType = {|
   [string]: Class<any>,
 |}
 
-type ProviderStateType = {||}
 
 const provide = (WrapTarget: WrapTargetType, config: provideConfigType) => (
-  class extends Component<{}, ProviderStateType> {
+  class extends Component<{}, {||}> {
 
     stores = {}
     mounted = false
