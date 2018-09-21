@@ -9,7 +9,13 @@ export type storesType = {|
   },
 |}
 
-export type AsyncStorage = {|
+export type persistMethodsType = {
+  set: (key: string, data: any, callback?: () => void) => void,
+  get: (key: string, callback?: (any) => void) => void,
+  remove: (key: string, callback?: () => void) => void,
+}
+
+export type AsyncStorageType = {
 
   setItem(
     key: string,
@@ -27,4 +33,8 @@ export type AsyncStorage = {|
     callback?: ?(error: ?Error) => void
   ): Promise<any>,
 
-|}
+}
+
+export type persistStrategyType =
+  | AsyncStorageType
+  | any // add other types

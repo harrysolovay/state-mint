@@ -1,5 +1,10 @@
 // flow type it!
 
+import type {
+  persistStrategyType,
+  persistMethodsType,
+} from '~/types'
+
 import getStorageMethods from './getStorageMethods'
 import getAsyncStorageMethods from './getAsyncStorageMethods'
 import getSecureStoreMethods from './getSecureStoreMethods'
@@ -11,7 +16,7 @@ import StateMintError, {
 
 export default class PersistMethods {
 
-  constructor (strategy, options) {
+  constructor (strategy: persistStrategyType, options?: {}) {
 
     const { constructor: { name: baseClassName } } = strategy
 
@@ -19,7 +24,7 @@ export default class PersistMethods {
 
       // LocalStorage or SessionStorage
       case 'Storage': {
-        const methods = getStorageMethods(strategy)
+        const methods: persistMethodsType = getStorageMethods(strategy)
         Object.assign(this, methods)
         break
       }
@@ -32,7 +37,7 @@ export default class PersistMethods {
           strategy.getItem &&
           strategy.removeItem
         ) {
-          const methods = getAsyncStorageMethods(strategy)
+          const methods: persistMethodsType = getAsyncStorageMethods(strategy)
           Object.assign(this, methods)
           break
         }
@@ -43,7 +48,7 @@ export default class PersistMethods {
           strategy.getItemAsync &&
           strategy.deleteItemAsync
         ) {
-          const methods = getSecureStoreMethods(strategy, options)
+          const methods: persistMethodsType = getSecureStoreMethods(strategy, options)
           Object.assign(this, methods)
           break
         }
@@ -58,7 +63,7 @@ export default class PersistMethods {
 
         // document.cookie
         if(strategy === document.cookie) {
-          const methods = getCookieMethods(strategy, options)
+          const methods: persistMethodsType = getCookieMethods(strategy, options)
           Object.assign(this, methods)
           break
         }

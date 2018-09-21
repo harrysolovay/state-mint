@@ -9,10 +9,6 @@ import type {
   ComponentType
 } from 'react'
 
-import type {
-  storesType
-} from './types'
-
 import {
   StoreSubgroup,
   isRunningOnNative,
@@ -23,7 +19,7 @@ import {
 import StateMintError, {
   MISSING_FROM_STORE,
   MISSING_TO_STORE,
-  PERSIST_STRATEGY_MISSING,
+  MISSING_PERSIST_STRATEGY,
   INVALID_WRAP_TARGET,
   INVALID_MINT_CONFIG,
 } from '~/errors'
@@ -135,7 +131,7 @@ const provide = (WrapTarget: WrapTargetType, config: provideConfigType) => (
             // must pass strategy in React Native
             if (isRunningOnNative()) {
               throw new StateMintError(
-                PERSIST_STRATEGY_MISSING,
+                MISSING_PERSIST_STRATEGY,
                 storeKey,
               )
             } else {

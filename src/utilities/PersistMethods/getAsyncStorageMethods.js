@@ -1,8 +1,8 @@
 // @flow
 
-import type { AsyncStorage } from '~/types'
+import type { AsyncStorageType } from '~/types'
 
-export default (strategy: AsyncStorage) => ({
+export default (strategy: AsyncStorageType) => ({
 
   set: (key: string, data: any, callback?: () => void): void => {
     const stringified = JSON.stringify(data)

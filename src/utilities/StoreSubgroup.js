@@ -5,7 +5,7 @@ import type {
 } from '~/types'
 
 import StateMintError, {
-  STORE_KEY_INVALID,
+  INVALID_STORE_KEY,
 } from '~/errors'
 
 export default class StoreSubgroup {
@@ -20,7 +20,7 @@ export default class StoreSubgroup {
           .includes(key)
         if(!exists) {
           throw new StateMintError(
-            STORE_KEY_INVALID,
+            INVALID_STORE_KEY,
             key
           )
         }

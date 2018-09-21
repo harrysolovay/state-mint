@@ -2,18 +2,18 @@
 
 import { isRunningOnNative } from '~/utilities'
 
-export const PERSIST_STRATEGY_MISSING = 'PERSIST_METHOD_INVALID'
+export const MISSING_PERSIST_STRATEGY = 'MISSING_PERSIST_STRATEGY'
 export const PERSIST_STRATEGY_INVALID = 'PERSIST_STRATEGY_INVALID'
-export const STORE_KEY_INVALID = 'STORE_KEY_INVALID'
+export const INVALID_STORE_KEY = 'INVALID_STORE_KEY'
 export const MISSING_FROM_STORE = 'MISSING_FROM_STORE'
 export const MISSING_TO_STORE = 'MISSING_TO_STORE'
 export const INVALID_MINT_CONFIG = 'INVALID_MINT_CONFIG'
 export const INVALID_WRAP_TARGET = 'INVALID_WRAP_TARGET'
 
 const errors = {
-  PERSIST_STRATEGY_MISSING,
+  MISSING_PERSIST_STRATEGY,
   PERSIST_STRATEGY_INVALID,
-  STORE_KEY_INVALID,
+  INVALID_STORE_KEY,
   MISSING_FROM_STORE,
   MISSING_TO_STORE,
   INVALID_MINT_CONFIG,
@@ -25,7 +25,7 @@ type errorType = $Values<typeof errors>
 const generateMessage = (errorNameOrMessage, key) => {
   switch (errorNameOrMessage) {
 
-    case PERSIST_STRATEGY_MISSING: {
+    case MISSING_PERSIST_STRATEGY: {
       const potentialStrategies = isRunningOnNative()
         ? 'AsyncStorage or SecureStore'
         : `'cookie' or window.localStorage`
@@ -35,7 +35,7 @@ const generateMessage = (errorNameOrMessage, key) => {
     case PERSIST_STRATEGY_INVALID:
       return `Strategy '${ key }' is invalid. See documentation for a list of valid strategies: [url].`
 
-    case STORE_KEY_INVALID:
+    case INVALID_STORE_KEY:
       return `Cannot find store with key of '${ key }'; double check that you've initialized all stores whose keys are referenced from your connect() calls.`
 
     case MISSING_FROM_STORE:

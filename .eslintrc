@@ -10,8 +10,8 @@
     "flowtype-errors"
   ],
   "rules": {
-    "indent": [ 1, 2 ],
-    "quotes": [ 1, "single" ],
+    "indent": 0,
+    "quotes": 0,
     "semi": [ 1, "never" ],
     "flowtype/no-types-missing-file-annotation": 0,
     "flowtype-errors/show-errors": 1,
