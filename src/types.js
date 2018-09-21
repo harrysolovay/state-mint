@@ -15,24 +15,16 @@ export type persistMethodsType = {
   remove: (key: string, callback?: () => void) => void,
 }
 
+export type storageType = {
+  setItem: (key: string, value: string) => void,
+  getItem: (key: string) => string | null,
+  removeItem: (key: string) => void,
+}
+
 export type AsyncStorageType = {
-
-  setItem(
-    key: string,
-    value: string,
-    callback?: ?(error: ?Error) => void
-  ): Promise<any>,
-
-  getItem(
-    key: string,
-    callback?: ?(error: ?Error, result: ?string) => void
-  ): Promise<any>,
-
-  removeItem(
-    key: string,
-    callback?: ?(error: ?Error) => void
-  ): Promise<any>,
-
+  setItem: (key: string, value: string, callback?: ?(error: ?Error) => void) => Promise<any>,
+  getItem: (key: string, callback?: ?(error: ?Error, result: ?string) => void) => Promise<any>,
+  removeItem: (key: string, callback?: ?(error: ?Error) => void) => Promise<any>,
 }
 
 export type persistStrategyType =

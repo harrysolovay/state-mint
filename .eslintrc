@@ -2,7 +2,8 @@
   "parser": "babel-eslint",
   "extends": [
     "react-app",
-    "plugin:flowtype/recommended"
+    "plugin:flowtype/recommended",
+    "google"
   ],
   "plugins": [
     "react",
@@ -13,9 +14,18 @@
     "indent": 0,
     "quotes": 0,
     "semi": [ 1, "never" ],
+    "max-len": [1, 100, 2],
+    "object-curly-spacing": [1, "always"],
     "flowtype/no-types-missing-file-annotation": 0,
     "flowtype-errors/show-errors": 1,
     "flowtype-errors/show-warnings": 1,
-    "jsx-a11y/href-no-hash": 0
+    "jsx-a11y/href-no-hash": 0,
+    "padded-blocks": 0,
+    "require-jsdoc": 0,
+    "no-trailing-spaces": [2, {
+      "skipBlankLines": true
+    }],
+    "eol-last": [2, "never"],
+    "no-var": 0
   }
 }

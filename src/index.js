@@ -6,7 +6,7 @@ import React, {
 } from 'react'
 
 import type {
-  ComponentType
+  ComponentType,
 } from 'react'
 
 import {
@@ -55,125 +55,131 @@ const provide = (WrapTarget: WrapTargetType, config: provideConfigType) => (
     stores = {}
     mounted = false
 
-    constructor () {
+    constructor() {
       super()
 
       for (let storeKey in config) {
+        if (config.hasOwnProperty(storeKey)) {
 
-        const Store = config[storeKey]
-
-        Store.prototype.setState = (updater, callback) => {
-
-          // avoid error-throwing operations if state is undefined
-          if (!this.stores[storeKey].state) {
-            this.stores[storeKey].state = {}
-          }
-
-          // get new state
-          const newState = typeof updater === 'function'
-            ? updater(this.stores[storeKey].state)
-            : updater
-
-          // avoid unnecessary operations if store data unchanged
-          if (JSON.stringify(this.stores[storeKey].state) === JSON.stringify(newState)) {
-            callback && callback()
-          }
-
-          // assign new state without pointing to new memory
-          Object.assign(this.stores[storeKey].state, newState)
-
-          // trigger re-render
-          this.mounted && this.setState({})
+          const Store = config[storeKey]
           
+          Store.prototype.setState = (
+            updater: {} | (lastState: {}) => {},
+            callback?: () => {},
+          ) => {
+
+            // get references to self
+            const store = this.stores[storeKey]
+            const { state: lastState, persist } = store
+
+            // get the new state
+            const newState = typeof updater === 'function'
+              ? updater(lastState)
+              : updater
+
+            // avoid unnecessary operations if store data unchanged
+            if (JSON.stringify(lastState) === JSON.stringify(newState)) {
+              callback && callback()
+              return
+            }
+
+            // assign new state without pointing to new memory
+            Object.assign(store, { state: newState })
+
+            // trigger re-render
+            this.mounted && this.setState({})
+
+            // trigger callback
+            callback && callback()
+            
+            // trigger persist if persist.fromStore doesn't exclude state
+            persist && persist._referencesState && persist()
+
+          }
+
+          // instanciate & gather references
+          const store = new Store()
+          this.stores[storeKey] = store
+          const { persist } = store
+
           // if defined
-          const { persist } = this.stores[storeKey]
+          if (persist) {
 
-          // TODO: do this, only if keyword 'state' in Stringified fromState
-          // trigger save
-          persist && persist()
+            let strategy
 
-          // trigger callback
-          callback && callback()
-
-        }
-
-        // instanciate
-        this.stores[storeKey] = new Store()
-
-        // get truth / configuration object from instance
-        const { persist } = this.stores[storeKey]
-
-        // if defined
-        if(persist) {
-
-          // get specifics from configuration
-          let { strategy, options, fromStore, toStore } = persist
-
-          // can't use one without the other
-          if(fromStore || toStore) {
-            if(!fromStore) {
-              throw new StateMintError(
-                MISSING_FROM_STORE,
-                storeKey,
-              )
-            }
-            if(!toStore) {
-              throw new StateMintError(
-                MISSING_TO_STORE,
-                storeKey,
-              )
-            }
-          }
-
-          // accept persist as Boolean instead of { ...config }
-          // (aka., setting `persist = true` in class definition)
-          if (typeof persist === 'boolean') {
-            // must pass strategy in React Native
-            if (isRunningOnNative()) {
-              throw new StateMintError(
-                MISSING_PERSIST_STRATEGY,
-                storeKey,
-              )
+            // accept persist as Boolean instead of { ...config }
+            // (aka., setting `persist = true` in class definition)
+            if (typeof persist === 'boolean') {
+              // must pass strategy in React Native
+              if (isRunningOnNative()) {
+                throw new StateMintError(
+                  MISSING_PERSIST_STRATEGY,
+                  storeKey,
+                )
+              } else {
+                // otherwise, default to localStorage
+                strategy = window.localStorage
+              }
             } else {
-              // otherwise, default to localStorage
-              strategy = window.localStorage
+              ({ strategy } = persist)
             }
-          }
 
-          // create persist methods ({ set, get, remove })
-          const persistMethods = new PersistMethods(strategy, options)
+            // get specifics from configuration
+            let { fromStore, toStore, options } = persist
 
-          // override user-defined persist settings
-          Object.assign(this.stores[storeKey], {
+            // can't use one without the other
+            if (
+              (fromStore || toStore) &&
+              !(fromStore && toStore)
+            ) {
+              throw new StateMintError(
+                fromStore
+                  ? MISSING_TO_STORE
+                  : MISSING_FROM_STORE,
+                storeKey,
+              )
+            }
+
+            // create persist methods ({ set, get, remove })
+            const persistMethods = new PersistMethods(strategy, options)
+
+            // override user-defined persist settings
             // ...with the configured persist save trigger
-            persist: () => {
+            store.persist = () => {
               persistMethods.set(
                 storeKey,
                 fromStore
                   ? fromStore()
-                  : this.stores[storeKey].state
+                  : store.state
               )
             }
-          })
 
-          // fetch persisted data
-          persistMethods.get(storeKey, (data) => {
-            if(data) {
-              if(toStore) {
-                // map to correct destination
-                toStore(data)
-              } else {
-                // if !toStore, assume direct mapping of state
-                this.stores[storeKey].setState(data)
-              }
-            }
-          })
+            // only trigger persist with setState if persisting state,
+            // aka. users might persist instance vars other than state
+            const _referencesState = (
+              !fromStore ||
+              String(fromStore).includes('state')
+            )
 
+            Object.assign(store.persist, {
+              ...persist,
+              _referencesState,
+            })
+
+            // fetch persisted data
+            persistMethods.get(storeKey, (data) => {
+              data &&
+                toStore
+                  ? toStore(data)
+                  : store.setState(data)
+            })
+
+          }
         }
       }
     }
 
-    render () {
+    render() {
       return (
         <Provider value={ this.stores }>
           <WrapTarget { ...this.props } />
@@ -181,7 +187,7 @@ const provide = (WrapTarget: WrapTargetType, config: provideConfigType) => (
       )
     }
 
-    componentDidMount () {
+    componentDidMount() {
       this.mounted = true
     }
 

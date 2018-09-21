@@ -1,4 +1,5 @@
 // @flow
+/* eslint max-len: 0 */
 
 import { isRunningOnNative } from '~/utilities'
 
@@ -67,11 +68,7 @@ const generateMessage = (errorNameOrMessage, key) => {
 }
 
 export default class StateMintError extends Error {
-  constructor(error: errorType, key?: string) {
-    super(
-      generateMessage(
-        ...arguments
-      )
-    )
+  constructor(...args: Array<errorType | string>) {
+    super(generateMessage(...args))
   }
 }

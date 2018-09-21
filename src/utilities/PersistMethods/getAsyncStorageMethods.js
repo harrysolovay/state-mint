@@ -18,7 +18,7 @@ export default (strategy: AsyncStorageType) => ({
 
   remove: (key: string, callback?: () => void): void => {
     strategy.removeItem(key, () => {
-      if(callback) callback()
+      if (callback) callback()
     })
   },
 

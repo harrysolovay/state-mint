@@ -1,7 +1,7 @@
 // @flow
 
 import type {
-  storesType
+  storesType,
 } from '~/types'
 
 import StateMintError, {
@@ -18,7 +18,7 @@ export default class StoreSubgroup {
         const exists = Object
           .keys(stores)
           .includes(key)
-        if(!exists) {
+        if (!exists) {
           throw new StateMintError(
             INVALID_STORE_KEY,
             key

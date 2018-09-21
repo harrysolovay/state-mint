@@ -31,11 +31,8 @@ export default {
   ],
 
   plugins: [
-
     eslint(),
-
     resolve(),
-
     babel({
       exclude: 'node_modules/**',
       runtimeHelpers: true,

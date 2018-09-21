@@ -16,11 +16,11 @@ import StateMintError, {
 
 export default class PersistMethods {
 
-  constructor (strategy: persistStrategyType, options?: {}) {
+  constructor(strategy: persistStrategyType, options?: {}) {
 
     const { constructor: { name: baseClassName } } = strategy
 
-    switch(baseClassName) {
+    switch (baseClassName) {
 
       // LocalStorage or SessionStorage
       case 'Storage': {
@@ -31,8 +31,8 @@ export default class PersistMethods {
 
       case 'Object': {
 
-        if(
-          // AsyncStorage
+        // AsyncStorage
+        if (
           strategy.setItem &&
           strategy.getItem &&
           strategy.removeItem
@@ -43,7 +43,7 @@ export default class PersistMethods {
         }
 
         // SecureStore
-        if(
+        if (
           strategy.setItemAsync &&
           strategy.getItemAsync &&
           strategy.deleteItemAsync
@@ -62,7 +62,7 @@ export default class PersistMethods {
       case 'String': {
 
         // document.cookie
-        if(strategy === document.cookie) {
+        if (strategy === document.cookie) {
           const methods: persistMethodsType = getCookieMethods(strategy, options)
           Object.assign(this, methods)
           break
