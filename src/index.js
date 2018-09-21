@@ -161,13 +161,14 @@ const provide = (WrapTarget: WrapTargetType, config: provideConfigType) => (
             }
           })
 
-          // persistMethods.remove(storeKey)
+          // fetch persisted data
           persistMethods.get(storeKey, (data) => {
-            // console.log('should hit', storeKey)
             if(data) {
               if(toStore) {
+                // map to correct destination
                 toStore(data)
               } else {
+                // if !toStore, assume direct mapping of state
                 this.stores[storeKey].setState(data)
               }
             }
