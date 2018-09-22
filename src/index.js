@@ -158,7 +158,7 @@ const provide = (WrapTarget: WrapTargetType, config: provideConfigType) => (
             // aka. users might persist instance vars other than state
             const _referencesState = (
               !fromStore ||
-              String(fromStore).includes('state')
+              String(fromStore).includes('this.state')
             )
 
             Object.assign(store.persist, {
@@ -168,10 +168,12 @@ const provide = (WrapTarget: WrapTargetType, config: provideConfigType) => (
 
             // fetch persisted data
             persistMethods.get(storeKey, (data) => {
-              data &&
+              console.log(storeKey, store.state)
+              if (data) {
                 toStore
                   ? toStore(data)
                   : store.setState(data)
+              }
             })
 
           }
