@@ -6,7 +6,6 @@
 <hr />
 
 [![MIT License][license-badge]][license]
-[![Code Coverage][coverage-badge]][coverage]
 [![version][version-badge]][package]
 [![PRs Welcome][prs-badge]][prs]
 [![Build Status][build-badge]][build]
@@ -341,10 +340,8 @@ MIT
 
 [npm]: https://www.npmjs.com/
 [node]: https://nodejs.org
-[build-badge]: https://img.shields.io/travis/kentcdodds/state-mint.svg?style=flat-square
+[build-badge]: https://img.shields.io/travis/harrysolovay/state-mint.svg?style=flat-square
 [build]: https://travis-ci.org/harrysolovay/state-mint
-[coverage-badge]: https://img.shields.io/codecov/c/github/harrysolovay/state-mint.svg?style=flat-square
-[coverage]: https://codecov.io/github/harrysolovay/state-mint
 [version-badge]: https://img.shields.io/npm/v/state-mint.svg?style=flat-square
 [package]: https://www.npmjs.com/package/state-mint
 [downloads-badge]: https://img.shields.io/npm/dm/state-mint.svg?style=flat-square
