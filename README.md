@@ -221,7 +221,7 @@ export default class Counter {
 
 In this case, we want to persist info about the user, but we don't want to persist whether or not to show the bio.
 
-```js
+```diff
 const DEFAULT_STATE = {
   loggedIn: false,
   username: null,
@@ -238,18 +238,18 @@ export default class Account {
     strategy: window.localStorage,
 
 	 // return an object containing the data you wish to persist
-    fromStore: () => {
-      const { bioShowing, ...user } = this.state
-      return user
-    },
++   fromStore: () => {
++     const { bioShowing, ...user } = this.state
++     return user
++   },
 
 	 // when persisted data gets retrieved, place it where it goes
-    toStore: (persistedData) => {
-      this.setState((lastState) => ({
-        ...lastState,
-        ...persistedData,
-      }))
-    },
++   toStore: (persistedData) => {
++     this.setState((lastState) => ({
++       ...lastState,
++       ...persistedData,
++     }))
++   },
 
   }
 
@@ -284,7 +284,7 @@ with each setState call, your data will be persisted if the following conditions
 
 To trigger a new persist, independent of setState, simply call `this.persist()` from within your store. It won't trigger a re-render, but it will save the data to your chosen or the default strategy.
 
-```js
+```diff
 export default class SomeToggle {
 
   outOfStateBoolean = false
