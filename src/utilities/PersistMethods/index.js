@@ -1,7 +1,7 @@
-// flow type it!
+// @flow
 
 import type {
-  persistStrategyType,
+  optionsType,
   persistMethodsType,
 } from '~/types'
 
@@ -16,7 +16,11 @@ import StateMintError, {
 
 export default class PersistMethods {
 
-  constructor(strategy: persistStrategyType, options?: {}) {
+  set: (key: string, data: any, callback?: () => void) => void
+  get: (key: string, callback?: (any) => void) => void
+  remove: (key: string, callback?: () => void) => void
+
+  constructor(strategy: any, options?: optionsType) {
 
     const { constructor: { name: baseClassName } } = strategy
 

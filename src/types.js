@@ -21,12 +21,25 @@ export type storageType = {
   removeItem: (key: string) => void,
 }
 
+export type cookieType = typeof document.cookie
+export type optionsType = {|
+  days?: number,
+|}
+
 export type AsyncStorageType = {
-  setItem: (key: string, value: string, callback?: ?(error: ?Error) => void) => Promise<any>,
-  getItem: (key: string, callback?: ?(error: ?Error, result: ?string) => void) => Promise<any>,
-  removeItem: (key: string, callback?: ?(error: ?Error) => void) => Promise<any>,
+  setItem: (key: string, value: string, callback?: ?(error: ?Error) => void) => Promise<string>,
+  getItem: (key: string, callback?: ?(error: ?Error, result: ?string) => void) => Promise<string>,
+  removeItem: (key: string, callback?: ?(error: ?Error) => void) => Promise<string>,
+}
+
+export type SecureStore = {
+  setItemAsync: (key: string, value: string, options: {}) => Promise<string>,
+  getItemAsync: (key: string, options: {}) => Promise<string>,
+  deleteItemAsync: (key: string, options: {}) => Promise<string>,
 }
 
 export type persistStrategyType =
+  | storageType
+  | cookieType
   | AsyncStorageType
-  | any // add other types
+  | SecureStore

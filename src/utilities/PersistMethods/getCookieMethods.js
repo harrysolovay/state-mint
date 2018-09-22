@@ -1,9 +1,9 @@
 // @flow
 
-type cookieType = typeof document.cookie
-type optionsType = {|
-  days?: number,
-|}
+import type {
+  cookieType,
+  optionsType,
+} from '~/types'
 
 export default (strategy: cookieType, options: optionsType={ days: 14 }) => ({
 
