@@ -332,7 +332,7 @@ For the sake of not overestimating my foresight. Athough I might soon ditch the 
 
 ### What's next?
 
-I want to create a `babel-plugin-state-mint` package that allows you to use statemint with even less code. You would decorate your store class, which would make it available to your components. Within a component, you could simply reference `this.props.stores.storeName` or `props.stores.storeName`, and the plugin would (behind the scenes) 'mint' the component with the storeKeys that it referenced. It would also find the lowest-level node that contains all store-referencing components, and 'mint' it with all of the decorated stores. I want 'mint' to be the only thing ever accessed from the `state-mint` package.
+I want to create a `babel-plugin-state-mint` package that allows you to use statemint with even less code. You would decorate your store class, which would make it available to your components. Within a component, you could simply reference `this.props.stores.storeName` or `props.stores.storeName`, and the plugin would (behind the scenes) 'mint' the component with the storeKeys that it referenced. It would also find the lowest-level node that contains all store-referencing components, and 'mint' it with all of the decorated stores. I want 'mint' to be the only export ever needed from the `state-mint` package.
 
 ## LICENSE
 
