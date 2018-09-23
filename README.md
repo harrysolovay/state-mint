@@ -237,13 +237,13 @@ export default class Account {
 
     strategy: window.localStorage,
 
-	 // return an object containing the data you wish to persist
+  // return an object containing the data you wish to persist
 +   fromStore: () => {
 +     const { bioShowing, ...user } = this.state
 +     return user
 +   },
 
-	 // when persisted data gets retrieved, place it where it goes
+  // when persisted data gets retrieved, place it where it goes
 +   toStore: (persistedData) => {
 +     this.setState((lastState) => ({
 +       ...lastState,
