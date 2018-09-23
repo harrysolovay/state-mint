@@ -168,7 +168,6 @@ const provide = (WrapTarget: WrapTargetType, config: provideConfigType) => (
 
             // fetch persisted data
             persistMethods.get(storeKey, (data) => {
-              console.log(storeKey, store.state)
               if (data) {
                 toStore
                   ? toStore(data)
