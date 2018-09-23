@@ -320,11 +320,11 @@ export default class SomeToggle {
 
 ### How can I use `setState` without extending another class where `setState` is defined?
 
-Before your store is constructed, the `setState` method is attached to the class's prototype.
+Before your store is constructed, the `setState` method is attached to the class prototype.
 
 ### But, is it slow to attach the `setState` method to each store class prototype?
 
-No, quite the oposite actually. When you inherit from a class with a pre-defined method, the inheritence chain (contrary to what you might think) is no precompiled. This means that inheriting will result in a series of checks helper and functions being executed at runtime. It's lighter to attach the `setState` method.
+No, quite the oposite actually. When you inherit from a class with a pre-defined method, the inheritence chain (contrary to what you might think) is not precompiled. This means that inheriting will result in a series of checks helper and functions being executed at runtime. It's lighter to attach the `setState` method.
 
 ### Why does it use React's Context API?
 

@@ -5,7 +5,7 @@ import type {
   optionsType,
 } from '~/types'
 
-export default (strategy: cookieType, options: optionsType={ days: 14 }) => ({
+export default (strategy: cookieType, options?: optionsType={ days: 14 }) => ({
 
   set: (key: string, data: any, callback?: () => void): void => {
     const stringified = JSON.stringify(data)

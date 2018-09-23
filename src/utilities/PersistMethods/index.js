@@ -1,8 +1,11 @@
 // @flow
 
 import type {
+  setPersistedData,
+  getPersistedData,
+  removePersistedData,
   optionsType,
-  persistMethodsType,
+  PersistMethodsType,
 } from '~/types'
 
 import getStorageMethods from './getStorageMethods'
@@ -16,9 +19,9 @@ import StateMintError, {
 
 export default class PersistMethods {
 
-  set: (key: string, data: any, callback?: () => void) => void
-  get: (key: string, callback?: (any) => void) => void
-  remove: (key: string, callback?: () => void) => void
+  set: setPersistedData
+  get: getPersistedData
+  remove: removePersistedData
 
   constructor(strategy: any, options?: optionsType) {
 
@@ -28,7 +31,7 @@ export default class PersistMethods {
 
       // LocalStorage or SessionStorage
       case 'Storage': {
-        const methods: persistMethodsType = getStorageMethods(strategy)
+        const methods: PersistMethodsType = getStorageMethods(strategy)
         Object.assign(this, methods)
         break
       }
@@ -41,7 +44,7 @@ export default class PersistMethods {
           strategy.getItem &&
           strategy.removeItem
         ) {
-          const methods: persistMethodsType = getAsyncStorageMethods(strategy)
+          const methods: PersistMethodsType = getAsyncStorageMethods(strategy)
           Object.assign(this, methods)
           break
         }
@@ -52,7 +55,7 @@ export default class PersistMethods {
           strategy.getItemAsync &&
           strategy.deleteItemAsync
         ) {
-          const methods: persistMethodsType = getSecureStoreMethods(strategy, options)
+          const methods: PersistMethodsType = getSecureStoreMethods(strategy, options)
           Object.assign(this, methods)
           break
         }
@@ -67,7 +70,7 @@ export default class PersistMethods {
 
         // document.cookie
         if (strategy === document.cookie) {
-          const methods: persistMethodsType = getCookieMethods(strategy, options)
+          const methods: PersistMethodsType = getCookieMethods(strategy, options)
           Object.assign(this, methods)
           break
         }

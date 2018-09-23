@@ -12,13 +12,13 @@ export default (strategy: AsyncStorageType) => ({
   get: (key: string, callback?: (any) => void): void => {
     strategy.getItem(key, (data: any) => {
       const parsed = JSON.parse(data)
-      if (callback) callback(parsed)
+      callback && callback(parsed)
     })
   },
 
   remove: (key: string, callback?: () => void): void => {
     strategy.removeItem(key, () => {
-      if (callback) callback()
+      callback && callback()
     })
   },
 

@@ -9,10 +9,14 @@ export type storesType = {|
   },
 |}
 
-export type persistMethodsType = {
-  set: (key: string, data: any, callback?: () => void) => void,
-  get: (key: string, callback?: (any) => void) => void,
-  remove: (key: string, callback?: () => void) => void,
+export type setPersistedData = (key: string, data: any, callback?: () => void) => void
+export type getPersistedData = (key: string, callback?: (any) => void) => void
+export type removePersistedData = (key: string, callback?: () => void) => void
+
+export type PersistMethodsType = {
+  set: setPersistedData,
+  get: getPersistedData,
+  remove: removePersistedData,
 }
 
 export type storageType = {
@@ -27,19 +31,19 @@ export type optionsType = {|
 |}
 
 export type AsyncStorageType = {
-  setItem: (key: string, value: string, callback?: ?(error: ?Error) => void) => Promise<string>,
-  getItem: (key: string, callback?: ?(error: ?Error, result: ?string) => void) => Promise<string>,
-  removeItem: (key: string, callback?: ?(error: ?Error) => void) => Promise<string>,
+  setItem: (key: string, value: string, callback?: ?(error: ?Error) => void) => void,
+  getItem: (key: string, callback?: ?(error: ?Error, result: ?string) => void) => void,
+  removeItem: (key: string, callback?: ?(error: ?Error) => void) => void,
 }
 
-export type SecureStore = {
-  setItemAsync: (key: string, value: string, options: {}) => Promise<string>,
-  getItemAsync: (key: string, options: {}) => Promise<string>,
-  deleteItemAsync: (key: string, options: {}) => Promise<string>,
+export type SecureStoreType = {
+  setItemAsync: (key: string, value: string, options?: {}) => void,
+  getItemAsync: (key: string, options?: {}) => void,
+  deleteItemAsync: (key: string, options?: {}) => void,
 }
 
 export type persistStrategyType =
   | storageType
   | cookieType
   | AsyncStorageType
-  | SecureStore
+  | SecureStoreType
