@@ -4,7 +4,6 @@ import type {
   setPersistedData,
   getPersistedData,
   removePersistedData,
-  persistStrategyType,
   optionsType,
   PersistMethodsType,
 } from '~/types'
@@ -24,7 +23,7 @@ export default class PersistMethods {
   get: getPersistedData
   remove: removePersistedData
 
-  constructor(strategy: mixed, options?: optionsType) {
+  constructor(strategy: any, options?: optionsType) {
 
     const { constructor: { name: baseClassName } } = strategy
 
