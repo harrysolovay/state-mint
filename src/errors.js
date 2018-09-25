@@ -1,7 +1,6 @@
-// @flow
 /* eslint max-len: 0 */
 
-import { isRunningOnNative } from '~/utilities'
+// import { isRunningOnNative } from '~/utilities'
 
 export const MISSING_PERSIST_STRATEGY = 'MISSING_PERSIST_STRATEGY'
 export const PERSIST_STRATEGY_INVALID = 'PERSIST_STRATEGY_INVALID'
@@ -11,23 +10,22 @@ export const MISSING_TO_STORE = 'MISSING_TO_STORE'
 export const INVALID_MINT_CONFIG = 'INVALID_MINT_CONFIG'
 export const INVALID_WRAP_TARGET = 'INVALID_WRAP_TARGET'
 
-const errors = {
-  MISSING_PERSIST_STRATEGY,
-  PERSIST_STRATEGY_INVALID,
-  INVALID_STORE_KEY,
-  MISSING_FROM_STORE,
-  MISSING_TO_STORE,
-  INVALID_MINT_CONFIG,
-  INVALID_WRAP_TARGET,
-}
-
-type errorType = $Values<typeof errors>
+// const errors = {
+//   MISSING_PERSIST_STRATEGY,
+//   PERSIST_STRATEGY_INVALID,
+//   INVALID_STORE_KEY,
+//   MISSING_FROM_STORE,
+//   MISSING_TO_STORE,
+//   INVALID_MINT_CONFIG,
+//   INVALID_WRAP_TARGET,
+// }
 
 const generateMessage = (errorNameOrMessage, key) => {
   switch (errorNameOrMessage) {
 
     case MISSING_PERSIST_STRATEGY: {
-      const potentialStrategies = isRunningOnNative()
+      const isRunningOnNative = false
+      const potentialStrategies = isRunningOnNative // isRunningOnNative()
         ? 'AsyncStorage or SecureStore'
         : `'cookie' or window.localStorage`
       return `Must assign a valid persistence strategy (such as '${ potentialStrategies }), in '${ key }' store.`
@@ -67,8 +65,10 @@ const generateMessage = (errorNameOrMessage, key) => {
   }
 }
 
-export default class StateMintError extends Error {
-  constructor(...args: Array<errorType | string>) {
-    super(generateMessage(...args))
-  }
+export default (...args) => {
+  throw new Error(
+    generateMessage(
+      ...args
+    )
+  )
 }

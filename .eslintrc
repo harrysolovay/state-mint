@@ -26,6 +26,7 @@
       "skipBlankLines": true
     }],
     "eol-last": [2, "never"],
-    "no-var": 0
+    "no-var": 0,
+    "no-invalid-this": 0
   }
 }

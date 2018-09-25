@@ -1,6 +1,6 @@
 // @flow
 
-export { default as StoreSubgroup } from './StoreSubgroup'
+export { default as getStoreSubgroup } from './getStoreSubgroup'
 
 export { default as PersistMethods } from './PersistMethods'
 
