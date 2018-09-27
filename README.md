@@ -1,6 +1,6 @@
 <div align="center">
-<h1>State Mint 🌿</h1>
-keep your project fresh
+<h1>State Mint</h1>
+keep your project fresh 🌿
 <br><br>
 </div>
 <hr />
