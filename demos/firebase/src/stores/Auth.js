@@ -12,7 +12,7 @@ export default class Account {
 
   state = { ...DEFAULT_STATE }
 
-  persist = { strategy: window.localStorage }
+  persist = true
 
   logIn = async () => {
     this.setState({ loading: true })

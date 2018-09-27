@@ -5,26 +5,40 @@ import React, {
 import {
   forOf,
   forEach,
+  isComponent,
 } from '~/utilities'
+
+import error from '~/errors'
 
 import persist from './persist'
 
 export default (config) => {
 
+  // ERROR: missing config
+  // ERROR: invalid config
+
+  typeof config !== 'object' &&
+    error('invalid config')
+
   const stores = {}
 
   forOf(config, (key) => {
 
+    typeof config[key] !== 'function' &&
+      error('invalid value in config')
+
     class Store extends config[key] {
+
+      $ = stores
+      _listeners = []
 
       constructor() {
         super()
-        
         this.persist &&
           persist(this, key)
       }
 
-      setState(updater, callback) {
+      async setState(updater, callback) {
 
         const { state: lastState } = this
 
@@ -45,26 +59,39 @@ export default (config) => {
           newState,
         )
 
-        const { _listeners: callbacks } = this
-        callbacks && forEach(callbacks, (fn) => fn())
-
         const { persist } = this
         const { _referencesState } = persist
         persist && _referencesState && persist()
 
+        const { _listeners } = this
+        const pending = _listeners.map((fn) => fn())
+        await Promise.all(pending)
+
         callback && callback()
 
       }
-
     }
 
     stores[key] = new Store()
     
   })
 
-  return (WrapTarget, keys) => {
+  return (WrapTarget, keys, ...args) => {
 
-    console.log(WrapTarget, keys)
+    !WrapTarget &&
+      error('missing WrapTarget')
+
+    !isComponent(WrapTarget) &&
+      error('invalid WrapTarget')
+
+    !keys &&
+      error('missing keys')
+
+    !Array.isArray(keys) &&
+      error('invalid keys')
+
+    args.length > 0 &&
+      error('too many args!')
 
     return class extends Component {
 
@@ -74,34 +101,33 @@ export default (config) => {
           WrapTarget.name
         })`
 
-      rerender = () => this.setState({})
+      rerender = () => (
+        new Promise((resolve) => (
+          this.mounted
+            ? this.setState({})
+            : resolve()
+        ))
+      )
 
       subscribe = (to = keys) => {
-        if (!this.subscribed) {
-          forEach(to, (key) => {
-            if (stores[key]._listeners) {
-              stores[key]._listeners.push(this.rerender)
-            } else {
-              stores[key]._listeners = [this.rerender]
-            }
-          })
-          this.subscribed = true
-        }
+        forEach(to, (key) => {
+          stores[key]._listeners
+            .push(this.rerender)
+        })
       }
 
       unsubscribe = (from = keys) => {
-        if (this.subscribed) {
-          forEach(from, (key) => {
-            stores[key]._listeners = stores[key]._listeners
-              .filter((fn) => fn !== this.rerender)
-          })
-          this.subscribed = false
-        }
+        forEach(from, (key) => {
+          const i = stores[key]._listeners
+            .indexOf(this.renderer)
+          stores[key]._listeners.splice(i, 1)
+        })
       }
 
-      constructor() {
+      constructor(props) {
         super()
-        this.subscribe()
+        const { $ } = props
+        $ && error('overriding stores')
       }
 
       render() {
@@ -119,11 +145,15 @@ export default (config) => {
         )
       }
 
-      componentWillUnmount() {
-        this.unsubscribe()
+      componentDidMount() {
+        this.mounted = true
+        this.subscribe()
       }
 
+      componentWillUnmount() {
+        this.mounted = false
+        this.unsubscribe()
+      }
     }
   }
-
 }
