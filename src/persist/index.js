@@ -16,7 +16,10 @@ export default (store, key) => {
 
   let strategy = typeof persist === 'boolean'
     ? IN_NATIVE
-      ? error(MISSING_PERSIST_STRATEGY, key)
+      ? error(
+          MISSING_PERSIST_STRATEGY,
+          key,
+        )
       : window.localStorage
     : persist.strategy
 

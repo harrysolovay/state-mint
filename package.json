@@ -1,6 +1,6 @@
 {
   "name": "state-mint",
-  "description": "an intuitive, yet powerful state layer that keeps your project fresh 🌿",
+  "description": "an intuitive, expressive API for React state management & persistence",
   "author": "Harry Solovay <harrysolovay@gmail.com> (harrysolovay.com)",
   "version": "0.1.2",
   "license": "MIT",

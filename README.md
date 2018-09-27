@@ -1,6 +1,6 @@
 <div align="center">
 <h1>State Mint 🌿</h1>
-"Mint: A place where money is coined, especially under state authority." Oxford English Dictionary
+keep your project fresh 🌿
 <br><br>
 </div>
 <hr />
