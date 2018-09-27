@@ -1,7 +1,7 @@
 import React from 'react'
 import connect from '../stores'
 
-const Hello = ({ $: { hello } }) => (
+export default connect(({ $: { hello } }) => (
   <div>
     <button
       children='next'
@@ -9,6 +9,4 @@ const Hello = ({ $: { hello } }) => (
     />
     <span children={ hello.state.currentName } />
   </div>
-)
-
-export default connect(Hello, ['hello'])
+), ['hello'])

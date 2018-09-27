@@ -1,7 +1,7 @@
 import React from 'react'
 import connect from '../stores'
 
-const Counter = ({ $: { counter } }) => (
+export default connect(({ $: { counter } }) => (
   <div>
     <button
       children='-'
@@ -13,6 +13,4 @@ const Counter = ({ $: { counter } }) => (
       onClick={ counter.increment }
     />
   </div>
-)
-
-export default connect(Counter, ['counter'])
+), ['counter'])

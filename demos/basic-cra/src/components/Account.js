@@ -1,7 +1,7 @@
 import React from 'react'
 import connect from '../stores'
 
-const Account = ({ $: { account } }) => (
+export default connect(({ $: { account } }) => (
   <div>
     <button
       children={
@@ -56,6 +56,4 @@ const Account = ({ $: { account } }) => (
       />
     </div>
   </div>
-)
-
-export default connect(Account, ['account'])
+), ['account'])

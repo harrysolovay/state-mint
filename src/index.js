@@ -20,6 +20,7 @@ import {
   forOf,
   forEach,
   isComponent,
+  StoreSubgroup,
 } from '~/utilities'
 
 import persist from '~/persist'
@@ -160,13 +161,7 @@ export default (config, ...args) => {
         return (
           <WrapTarget
             { ...this.props }
-            $={
-              Object.assign({},
-                ...keys.map((key) => ({
-                  [key]: stores[key],
-                }))
-              )
-            }
+            $={ new StoreSubgroup(stores, keys) }
           />
         )
       }

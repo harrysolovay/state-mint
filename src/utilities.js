@@ -43,3 +43,13 @@ export const IN_NATIVE: boolean = (
   typeof navigator !== 'undefined' &&
   navigator.product === 'ReactNative'
 )
+
+export class StoreSubgroup {
+  constructor(stores, keys) {
+    Object.assign(this,
+      ...keys.map((key) => ({
+        [key]: stores[key],
+      }))
+    )
+  }
+}
