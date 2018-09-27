@@ -6,7 +6,7 @@ import {
 } from './methods'
 
 import error, {
-  PERSIST_STRATEGY_INVALID,
+  INVALID_PERSIST_STRATEGY,
 } from '~/errors'
 
 export default (strategy, options) => {
@@ -41,7 +41,7 @@ export default (strategy, options) => {
       }
 
       return error(
-        PERSIST_STRATEGY_INVALID,
+        INVALID_PERSIST_STRATEGY,
         baseClassName,
       )
     }
@@ -53,7 +53,7 @@ export default (strategy, options) => {
       }
 
       return error(
-        PERSIST_STRATEGY_INVALID,
+        INVALID_PERSIST_STRATEGY,
         baseClassName,
       )
     }
@@ -61,7 +61,7 @@ export default (strategy, options) => {
     default: {
 
       return error(
-        PERSIST_STRATEGY_INVALID,
+        INVALID_PERSIST_STRATEGY,
         baseClassName,
       )
     }

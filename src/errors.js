@@ -1,85 +1,55 @@
 /* eslint max-len: 0 */
 
-// import { isRunningOnNative } from '~/utilities'
+// import { IN_NATIVE } from '~/utilities'
+
+export const MISSING_CONFIG ='MISSING_CONFIG'
+export const INVALID_CONFIG ='INVALID_CONFIG'
+export const TOO_MANY_ARGS ='TOO_MANY_ARGS'
+export const MISSING_CONFIG_VALUES = 'MISSING_CONFIG_VALUES'
+export const INVALID_CONFIG_VALUE ='INVALID_CONFIG_VALUE'
 
 export const MISSING_WRAP_TARGET ='MISSING_WRAP_TARGET'
-export const MISSING_STORE_KEYS = 'MISSING_STORE_KEYS'
-export const MISSING_PERSIST_STRATEGY = 'MISSING_PERSIST_STRATEGY'
-export const PERSIST_STRATEGY_INVALID = 'PERSIST_STRATEGY_INVALID'
-export const INVALID_STORE_KEY = 'INVALID_STORE_KEY'
-export const MISSING_FROM_STORE = 'MISSING_FROM_STORE'
-export const MISSING_TO_STORE = 'MISSING_TO_STORE'
-export const INVALID_MINT_CONFIG = 'INVALID_MINT_CONFIG'
-export const INVALID_WRAP_TARGET = 'INVALID_WRAP_TARGET'
-export const PROPS_OVERRIDE_STORES = 'PROPS_OVERRIDE_STORES'
-export const INVALID_INITIAL_STATE = 'INVALID_INITIAL_STATE'
+export const INVALID_WRAP_TARGET ='INVALID_WRAP_TARGET'
+export const MISSING_KEYS ='MISSING_KEYS'
+export const INVALID_KEYS ='INVALID_KEYS'
+export const NONEXISTENT_KEY = 'NONEXISTENT_KEY'
+export const OVERRIDING_STORES ='OVERRIDING_STORES'
 
-// const errors = {
-// }
+export const MISSING_PERSIST_STRATEGY ='MISSING_PERSIST_STRATEGY'
+export const INVALID_PERSIST_STRATEGY ='INVALID_PERSIST_STRATEGY'
+export const MISSING_TO_STORE ='MISSING_TO_STORE'
+export const MISSING_FROM_STORE ='MISSING_FROM_STORE'
 
-const generateMessage = (errorNameOrMessage, key) => {
-  switch (errorNameOrMessage) {
+const errors = {
 
-    case MISSING_WRAP_TARGET: {
-      return `missing wrap target`
-    }
+  // initialize
+  MISSING_CONFIG: () => `missing config`,
+  INVALID_CONFIG: () => `invalid config`,
+  TOO_MANY_ARGS: () => `too many args`,
+  MISSING_CONFIG_VALUES: () => `missing config values`,
+  INVALID_CONFIG_VALUE: () => `invalid config values`,
 
-    case MISSING_STORE_KEYS: {
-      return `missing store keys`
-    }
+  // connect
+  MISSING_WRAP_TARGET: () => `missing WrapTarget`,
+  INVALID_WRAP_TARGET: () => `invalid WrapTarget`,
+  MISSING_KEYS: () => `missing keys`,
+  INVALID_KEYS: () => `invalid keys`,
+  NONEXISTENT_KEY: () => `nonexistent key`,
+  OVERRIDING_STORES: () => `overriding stores`,
 
-    case MISSING_PERSIST_STRATEGY: {
-      const isRunningOnNative = false
-      const potentialStrategies = isRunningOnNative // isRunningOnNative()
-        ? 'AsyncStorage or SecureStore'
-        : `'cookie' or window.localStorage`
-      return `Must assign a valid persistence strategy (such as '${ potentialStrategies }), in '${ key }' store.`
-    }
-
-    case PERSIST_STRATEGY_INVALID:
-      return `Strategy '${ key }' is invalid. See documentation for a list of valid strategies: [url].`
-
-    case INVALID_STORE_KEY:
-      return `Cannot find store with key of '${ key }'; double check that you've initialized all stores whose keys are referenced from your connect() calls.`
-
-    case MISSING_FROM_STORE:
-      return `Persisted data is mapped to '${ key }' store (with 'persist.toStore'), but the reverse mapping ('persist.fromStore') is undefined.`
-
-    case MISSING_TO_STORE:
-      return `Persisted data is mapped from '${ key }' store (with 'persist.fromStore'), but the reverse mapping ('persist.toStore') is undefined.`
-
-    case INVALID_MINT_CONFIG:
-      return `Cannot call 'mint' with supplied arguments; refer to documentation for correct usage.`
-
-    case INVALID_WRAP_TARGET: {
-      switch (key) {
-        case 'storesConfig':
-          return `The function returned from calling 'mint({ ...storesConfig })' can only be called with a valid React Component (which will then provide your stores to minted children).`
-        case 'storeKeys':
-          return `The function returned from calling 'mint([ ...storeKeys ])' can only be called with a valid React Component (to which your stores will be connected).`
-        default: // just incase
-          return `The function returned from calling 'mint(arg)' can only be called with a valid React Component.`
-      }
-    }
-
-    case PROPS_OVERRIDE_STORES:
-      return `Cannot use a custom 'stores' prop in an instance of a minted component. `
-
-    case INVALID_INITIAL_STATE:
-      return `State cannot be set to type ${ key }.`
-
-    default:
-      return errorNameOrMessage
-        ? errorNameOrMessage
-        : null
-
-  }
+  // persist
+  MISSING_PERSIST_STRATEGY: () => `missing persist strategy`,
+  INVALID_PERSIST_STRATEGY: () => `persist strategy`,
+  MISSING_TO_STORE: () => `missing to store`,
+  MISSING_FROM_STORE: () => `missing from store`,
+  
 }
 
 export default (...args) => {
+  console.log(args[0])
   throw new Error(
-    generateMessage(
-      ...args
-    )
+    errors[args[0]]
+      ? errors[args[0]](...args)
+      : args[0]
   )
 }

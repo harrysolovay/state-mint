@@ -2,35 +2,53 @@ import React, {
   Component,
 } from 'react'
 
+import error, {
+  MISSING_CONFIG,
+  INVALID_CONFIG,
+  TOO_MANY_ARGS,
+  MISSING_CONFIG_VALUES,
+  INVALID_CONFIG_VALUE,
+  MISSING_WRAP_TARGET,
+  INVALID_WRAP_TARGET,
+  MISSING_KEYS,
+  INVALID_KEYS,
+  NONEXISTENT_KEY,
+  OVERRIDING_STORES,
+} from '~/errors'
+
 import {
   forOf,
   forEach,
   isComponent,
 } from '~/utilities'
 
-import error from '~/errors'
+import persist from '~/persist'
 
-import persist from './persist'
+export default (config, ...args) => {
 
-export default (config) => {
-
-  // ERROR: missing config
-  // ERROR: invalid config
+  !config &&
+    error(MISSING_CONFIG)
 
   typeof config !== 'object' &&
-    error('invalid config')
+    error(INVALID_CONFIG)
+
+  args.length > 0 &&
+    error(TOO_MANY_ARGS)
+
+  Object.keys(config).length < 1 &&
+    error(MISSING_CONFIG_VALUES)
 
   const stores = {}
 
   forOf(config, (key) => {
 
     typeof config[key] !== 'function' &&
-      error('invalid value in config')
+      error(INVALID_CONFIG_VALUE)
 
     class Store extends config[key] {
 
       $ = stores
-      _listeners = []
+      _subscribers = []
 
       constructor() {
         super()
@@ -63,8 +81,8 @@ export default (config) => {
         const { _referencesState } = persist
         persist && _referencesState && persist()
 
-        const { _listeners } = this
-        const pending = _listeners.map((fn) => fn())
+        const { _subscribers } = this
+        const pending = _subscribers.map((fn) => fn())
         await Promise.all(pending)
 
         callback && callback()
@@ -73,25 +91,32 @@ export default (config) => {
     }
 
     stores[key] = new Store()
-    
+  
   })
 
   return (WrapTarget, keys, ...args) => {
 
     !WrapTarget &&
-      error('missing WrapTarget')
+      error(MISSING_WRAP_TARGET)
 
     !isComponent(WrapTarget) &&
-      error('invalid WrapTarget')
+      error(INVALID_WRAP_TARGET)
 
     !keys &&
-      error('missing keys')
+      error(MISSING_KEYS)
 
     !Array.isArray(keys) &&
-      error('invalid keys')
+      error(INVALID_KEYS)
+
+    for (let e of keys) {
+      !Object
+        .keys(stores)
+        .includes(e) &&
+          error(NONEXISTENT_KEY)
+    }
 
     args.length > 0 &&
-      error('too many args!')
+      error(TOO_MANY_ARGS)
 
     return class extends Component {
 
@@ -111,23 +136,24 @@ export default (config) => {
 
       subscribe = (to = keys) => {
         forEach(to, (key) => {
-          stores[key]._listeners
+          stores[key]._subscribers
             .push(this.rerender)
         })
       }
 
       unsubscribe = (from = keys) => {
         forEach(from, (key) => {
-          const i = stores[key]._listeners
+          const i = stores[key]._subscribers
             .indexOf(this.renderer)
-          stores[key]._listeners.splice(i, 1)
+          stores[key]._subscribers.splice(i, 1)
         })
       }
 
       constructor(props) {
         super()
         const { $ } = props
-        $ && error('overriding stores')
+        $ &&
+          error(OVERRIDING_STORES)
       }
 
       render() {
