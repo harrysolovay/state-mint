@@ -1,7 +1,7 @@
 import React from 'react'
-import mint from 'state-mint'
+import connect from '../stores'
 
-const Hello = ({ stores: { hello } }) => (
+const Hello = ({ $: { hello } }) => (
   <div>
     <button
       children='next'
@@ -11,4 +11,4 @@ const Hello = ({ stores: { hello } }) => (
   </div>
 )
 
-export default mint(['hello'])(Hello)
+export default connect(Hello, ['hello'])

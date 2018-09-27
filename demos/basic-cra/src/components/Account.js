@@ -1,7 +1,7 @@
 import React from 'react'
-import mint from 'state-mint'
+import connect from '../stores'
 
-const Account = ({ stores: { account } }) => (
+const Account = ({ $: { account } }) => (
   <div>
     <button
       children={
@@ -58,4 +58,4 @@ const Account = ({ stores: { account } }) => (
   </div>
 )
 
-export default mint(['account'])(Account)
+export default connect(Account, ['account'])

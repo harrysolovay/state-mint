@@ -3,126 +3,127 @@ import React, {
 } from 'react'
 
 import {
-  getStoreSubgroup,
+  forOf,
+  forEach,
 } from '~/utilities'
 
-const stores = {}
+import persist from './persist'
 
-const callbacksKey = Symbol()
+export default (config) => {
 
-export const initialize = (config) => {
-  for (let key in config) {
-    if (config.hasOwnProperty(key)) {
+  const stores = {}
 
-      class StoreInheritor extends config[key] {
+  forOf(config, (key) => {
 
-        setState(updater, callback) {
+    class Store extends config[key] {
 
-          const store = stores[key]
-          
-          const { state: lastState } = store
-          
-          const newState = typeof updater === 'function'
-            ? updater(lastState)
-            : updater
-  
-          const a = JSON.stringify(lastState)
-          const b = JSON.stringify(newState)
-  
-          if (a === b) {
-            callback && callback()
-            return
-          }
-  
-          stores[key].state = Object.assign({},
-            stores[key].state,
-            newState,
-          )
-  
+      constructor() {
+        super()
+        
+        this.persist &&
+          persist(this, key)
+      }
+
+      setState(updater, callback) {
+
+        const { state: lastState } = this
+
+        const newState = typeof updater === 'function'
+          ? updater(lastState)
+          : updater
+
+        const a = JSON.stringify(lastState)
+        const b = JSON.stringify(newState)
+
+        if (a === b) {
           callback && callback()
-  
-          stores[key][callbacksKey] &&
-            stores[key][callbacksKey]
-              .forEach((fn) => fn())
+          return
         }
 
-        _addSetStateCallback(callback) {
-          if (stores[key][callbacksKey]) {
-            stores[key][callbacksKey].push(callback)
-          } else {
-            stores[key][callbacksKey] = [callback]
-          }
-        }
-
-        _removeSetStateCallback(callback) {
-          stores[key][callbacksKey] = stores[key][callbacksKey]
-            .filter((fn) => fn !== callback)
-        }
-
-      }
-
-      stores[key] = new StoreInheritor()
-
-      stores[key]._parentScope = stores
-
-    }
-  }
-}
-
-export const connect = (WrapTarget, keys) => (
-  class extends Component {
-
-    static displayName =
-      `connect(${
-        WrapTarget.displayName ||
-        WrapTarget.name
-      })`
-
-    stores = keys
-      ? getStoreSubgroup(
-          stores,
-          keys,
+        this.state = Object.assign({},
+          lastState,
+          newState,
         )
-      : stores
 
-    update = () => this.setState({})
+        const { _listeners: callbacks } = this
+        callbacks && forEach(callbacks, (fn) => fn())
 
-    constructor() {
-      super()
+        const { persist } = this
+        const { _referencesState } = persist
+        persist && _referencesState && persist()
 
-      if (!keys) keys = Object.keys(stores)
+        callback && callback()
 
-      for (let i in keys) {
-        if (keys.hasOwnProperty(i)) {
-          const key = keys[i]
-          if (stores[key]) {
-            stores[key]._addSetStateCallback(this.update)
-          }
+      }
+
+    }
+
+    stores[key] = new Store()
+    
+  })
+
+  return (WrapTarget, keys) => {
+
+    console.log(WrapTarget, keys)
+
+    return class extends Component {
+
+      static displayName =
+        `connect(${
+          WrapTarget.displayName ||
+          WrapTarget.name
+        })`
+
+      rerender = () => this.setState({})
+
+      subscribe = (to = keys) => {
+        if (!this.subscribed) {
+          forEach(to, (key) => {
+            if (stores[key]._listeners) {
+              stores[key]._listeners.push(this.rerender)
+            } else {
+              stores[key]._listeners = [this.rerender]
+            }
+          })
+          this.subscribed = true
         }
       }
-    }
 
-    render() {
-      const {
-        props,
-        stores,
-      } = this
-      // props.stores && error(PROPS_OVERRIDE_STORES)
-      return (
-        <WrapTarget
-          { ...{
-            ...props,
-            stores,
-          }}
-        />
-      )
-    }
+      unsubscribe = (from = keys) => {
+        if (this.subscribed) {
+          forEach(from, (key) => {
+            stores[key]._listeners = stores[key]._listeners
+              .filter((fn) => fn !== this.rerender)
+          })
+          this.subscribed = false
+        }
+      }
 
-    componentWillUnmount() {
-      keys.forEach((key) => {
-        stores[key]._removeSetStateCallback(key)
-      })
-    }
+      constructor() {
+        super()
+        this.subscribe()
+      }
 
+      render() {
+        return (
+          <WrapTarget
+            { ...this.props }
+            $={
+              Object.assign({},
+                ...keys.map((key) => ({
+                  [key]: stores[key],
+                }))
+              )
+            }
+          />
+        )
+      }
+
+      componentWillUnmount() {
+        this.unsubscribe()
+      }
+
+    }
   }
-)
+
+}

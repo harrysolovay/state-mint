@@ -1,7 +1,7 @@
 import React from 'react'
-import mint from 'state-mint'
+import connect from '../stores'
 
-const Counter = ({ stores: { counter } }) => (
+const Counter = ({ $: { counter } }) => (
   <div>
     <button
       children='-'
@@ -15,4 +15,4 @@ const Counter = ({ stores: { counter } }) => (
   </div>
 )
 
-export default mint(['counter'])(Counter)
+export default connect(Counter, ['counter'])

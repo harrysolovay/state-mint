@@ -15,6 +15,7 @@
     "@babel/plugin-proposal-class-properties",
     "@babel/plugin-syntax-object-rest-spread",
     "@babel/plugin-transform-object-assign",
+    "loop-optimizer",
     ["module-resolver", {
       "root": ".",
       "alias": {
