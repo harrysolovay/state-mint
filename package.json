@@ -2,7 +2,7 @@
   "name": "state-mint",
   "description": "an intuitive, yet powerful state layer that keeps your project fresh 🌿",
   "author": "Harry Solovay <harrysolovay@gmail.com> (harrysolovay.com)",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "license": "MIT",
   "main": "lib/state-mint.cjs.js",
   "module": "lib/state-mint.es.js",
@@ -22,7 +22,7 @@
     "management"
   ],
   "peerDependencies": {
-    "react": "^16.3.0"
+    "react": "^15.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
