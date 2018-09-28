@@ -8,6 +8,7 @@ import error, {
   TOO_MANY_ARGS,
   MISSING_CONFIG_VALUES,
   INVALID_CONFIG_VALUE,
+  STORE_KEY_ALREADY_EXISTS,
   MISSING_WRAP_TARGET,
   INVALID_WRAP_TARGET,
   MISSING_KEYS,
@@ -23,7 +24,7 @@ import {
   StoreSubgroup,
 } from '~/utilities'
 
-import persist from '~/persist'
+import setPersistence from '~/persist'
 
 export default (config, ...args) => {
 
@@ -41,20 +42,21 @@ export default (config, ...args) => {
 
   const stores = {}
 
-  forOf(config, (key) => {
+  const createStoreConstructor = (key, Store) => {
 
-    typeof config[key] !== 'function' &&
+    typeof Store !== 'function' &&
       error(INVALID_CONFIG_VALUE, key)
 
-    class Store extends config[key] {
+    return class extends Store {
+
+      _subscribers = {}
 
       $ = stores
-      _subscribers = []
 
       constructor() {
         super()
         this.persist &&
-          persist(this, key)
+          setPersistence(this, key)
       }
 
       async setState(updater, callback) {
@@ -83,18 +85,38 @@ export default (config, ...args) => {
         persist && _referencesState && persist()
 
         const { _subscribers } = this
-        const pending = _subscribers.map(({ rerender }) => rerender())
+        const pending = Object
+          .values(_subscribers)
+          .map(({ rerender }) => rerender())
         await Promise.all(pending)
 
         callback && callback()
 
       }
     }
+  }
 
-    stores[key] = new Store()
+  const init = (config) => {
+    forOf(config, (key) => {
+
+      stores[key] &&
+        error(
+          STORE_KEY_ALREADY_EXISTS,
+          key,
+        )
+
+      const Store = createStoreConstructor(
+        key,
+        config[key],
+      )
+
+      stores[key] = new Store()
+
+    })
+  }
+
+  init(config)
   
-  })
-
   return (WrapTarget, keys, ...args) => {
 
     !WrapTarget &&
@@ -113,11 +135,16 @@ export default (config, ...args) => {
       !Object
         .keys(stores)
         .includes(key) &&
-          error(NONEXISTENT_KEY, e)
+          error(NONEXISTENT_KEY, key)
     }
 
     args.length > 0 &&
       error(TOO_MANY_ARGS)
+
+    const $ = new StoreSubgroup(
+      stores,
+      keys,
+    )
 
     return class extends Component {
 
@@ -128,31 +155,28 @@ export default (config, ...args) => {
           'WrapTarget'
         })`
 
-      $ = new StoreSubgroup(
-        stores,
-        keys,
-      )
+      _componentId = Math
+        .floor((1 + Math.random()) * 0x1000000)
+        .toString(16)
+        .substring(1)
 
       rerender = () => (
-        new Promise((resolve) => (
-          this.mounted
-            ? this.setState({})
-            : resolve()
-        ))
+        this.mounted
+          ? new Promise((resolve) => (
+              this.setState({}, resolve)
+            ))
+          : resolve()
       )
 
       subscribe = (to = keys) => {
         forEach(to, (key) => {
-          stores[key]._subscribers
-            .push(this)
+          stores[key]._subscribers[this._componentId] = this
         })
       }
 
       unsubscribe = (from = keys) => {
         forEach(from, (key) => {
-          const i = stores[key]._subscribers
-            .indexOf(this)
-          stores[key]._subscribers.splice(i, 1)
+          delete stores[key]._subscribers[this._componentId]
         })
       }
 
@@ -164,22 +188,20 @@ export default (config, ...args) => {
       }
 
       render() {
+
         const {
-          props, $,
-          rerender,
+          props,
           subscribe,
           unsubscribe,
         } = this
+
         return (
           <WrapTarget
             { ...props }
             $={{
               ...$,
-              _: {
-                rerender,
-                subscribe,
-                unsubscribe,
-              },
+              subscribe,
+              unsubscribe,
             }}
           />
         )

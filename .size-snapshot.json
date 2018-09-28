@@ -1,27 +1,27 @@
 {
   "lib/state-mint.cjs.js": {
-    "bundled": 16935,
-    "minified": 8413,
-    "gzipped": 2880
+    "bundled": 18562,
+    "minified": 9427,
+    "gzipped": 3110
   },
   "lib/state-mint.es.js": {
-    "bundled": 16589,
-    "minified": 8145,
-    "gzipped": 2795,
+    "bundled": 18196,
+    "minified": 9144,
+    "gzipped": 3030,
     "treeshaked": {
       "rollup": {
-        "code": 283,
-        "import_statements": 234
+        "code": 329,
+        "import_statements": 280
       },
       "webpack": {
-        "code": 1432
+        "code": 1511
       }
     }
   },
   "lib/state-mint.umd.js": {
-    "bundled": 18874,
-    "minified": 7457,
-    "gzipped": 2718
+    "bundled": 20717,
+    "minified": 8094,
+    "gzipped": 2951
   },
   "state-mint.min.js": {
     "bundled": 18874,
@@ -29,8 +29,8 @@
     "gzipped": 2718
   },
   "lib/state-mint.min.js": {
-    "bundled": 18874,
-    "minified": 7457,
-    "gzipped": 2718
+    "bundled": 20717,
+    "minified": 8094,
+    "gzipped": 2951
   }
 }

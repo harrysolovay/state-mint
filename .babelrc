@@ -12,9 +12,7 @@
   ],
   "plugins": [
     "@babel/plugin-transform-runtime",
-    ["@babel/plugin-proposal-class-properties", {
-      "loose": true
-    }],
+    ["@babel/plugin-proposal-class-properties"],
     "@babel/plugin-syntax-object-rest-spread",
     "@babel/plugin-transform-object-assign",
     "loop-optimizer",

@@ -1,16 +1,9 @@
-// @flow
+export default (strategy, options={ days: 14 }) => ({
 
-import type {
-  cookieType,
-  optionsType,
-} from '~/types'
-
-export default (strategy: cookieType, options?: optionsType={ days: 14 }) => ({
-
-  set: (key: string, data: any, callback?: () => void): void => {
+  set: (key, data, callback) => {
     const stringified = JSON.stringify(data)
     const { days } = options
-    let expiration: string
+    let expiration
     if (days) {
       const currentDate = new Date()
       const expirationTime = currentDate.getTime() + (days * 24 * 60 * 60 * 1000)
@@ -23,7 +16,7 @@ export default (strategy: cookieType, options?: optionsType={ days: 14 }) => ({
     callback && callback()
   },
 
-  get: (key: string, callback?: (any) => void): void => {
+  get: (key, callback) => {
     const cookies = document.cookie
       ? document.cookie.split('; ')
       : []
@@ -37,7 +30,7 @@ export default (strategy: cookieType, options?: optionsType={ days: 14 }) => ({
     }
   },
 
-  remove: (key: string, callback?: () => void): void => {
+  remove: (key, callback) => {
     document.cookie = `${ key }=; expires=Thu, 01 Jan 1970 00:00:01 GMT;`
     callback && callback()
   },

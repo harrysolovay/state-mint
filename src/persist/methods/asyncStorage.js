@@ -1,23 +1,19 @@
-// @flow
+export default (AsyncStorage) => ({
 
-import type { AsyncStorageType } from '~/types'
-
-export default (strategy: AsyncStorageType) => ({
-
-  set: (key: string, data: any, callback?: () => void): void => {
+  set: (key, data, callback) => {
     const stringified = JSON.stringify(data)
-    strategy.setItem(key, stringified, callback)
+    AsyncStorage.setItem(key, stringified, callback)
   },
 
-  get: (key: string, callback?: (any) => void): void => {
-    strategy.getItem(key, (data: any) => {
+  get: (key, callback) => {
+    AsyncStorage.getItem(key, (data) => {
       const parsed = JSON.parse(data)
       callback && callback(parsed)
     })
   },
 
-  remove: (key: string, callback?: () => void): void => {
-    strategy.removeItem(key, () => {
+  remove: (key, callback) => {
+    AsyncStorage.removeItem(key, () => {
       callback && callback()
     })
   },

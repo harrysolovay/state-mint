@@ -2,7 +2,7 @@ import React from 'react'
 import connect from '../stores'
 
 export default connect(({ $: { hello } }) => {
-  // console.log('rendering hello')
+  // console.log('rendering account')
   return (
     <div>
       <button

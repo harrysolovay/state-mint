@@ -39,6 +39,7 @@ export const isComponent = (InQuestion: mixed): boolean => {
   )
 }
 
+// TODO: complete w algorithm
 export const getDependencies = (Component) => {
 
   if (isFunctionalComponent(Component)) {

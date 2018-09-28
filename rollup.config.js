@@ -32,6 +32,7 @@ const globals = {
   '@babel/runtime/helpers/asyncToGenerator': '_asyncToGenerator',
   '@babel/runtime/helpers/inheritsLoose': '_inheritsLoose',
   '@babel/runtime/helpers/assertThisInitialized': '_assertThisInitialized',
+  '@babel/runtime/helpers/defineProperty': '_defineProperty',
 }
 
 export default (() => {

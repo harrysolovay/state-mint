@@ -1,25 +1,18 @@
-// @flow
+export default (SecureStore, options) => ({
 
-import type {
-  SecureStoreType,
-  optionsType,
-} from '~/types'
-
-export default (strategy: SecureStoreType, options?: optionsType) => ({
-
-  set: (key: string, data: any, callback?: () => void): void => {
+  set: (key, data, callback) => {
     (async () => {
       if (data) {
         const stringified = JSON.stringify(data)
-        await strategy.setItemAsync(key, stringified, options)
+        await SecureStore.setItemAsync(key, stringified, options)
         callback && callback()
       }
     })()
   },
 
-  get: (key: string, callback?: (any) => void): void => {
+  get: (key, callback) => {
     (async () => {
-      const data = await strategy.getItemAsync(key, options)
+      const data = await SecureStore.getItemAsync(key, options)
       if (data) {
         const parsed = JSON.parse(data)
         callback && callback(parsed)
@@ -27,9 +20,9 @@ export default (strategy: SecureStoreType, options?: optionsType) => ({
     })()
   },
 
-  remove: (key: string, callback?: () => void): void => {
+  remove: (key, callback) => {
     (async () => {
-      await strategy.deleteItemAsync(key, options)
+      await SecureStore.deleteItemAsync(key, options)
       callback && callback()
     })()
   },

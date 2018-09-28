@@ -8,6 +8,7 @@ export const INVALID_CONFIG ='INVALID_CONFIG'
 export const TOO_MANY_ARGS ='TOO_MANY_ARGS'
 export const MISSING_CONFIG_VALUES = 'MISSING_CONFIG_VALUES'
 export const INVALID_CONFIG_VALUE ='INVALID_CONFIG_VALUE'
+export const STORE_KEY_ALREADY_EXISTS = 'STORE_KEY_ALREADY_EXISTS'
 
 // connect
 export const MISSING_WRAP_TARGET ='MISSING_WRAP_TARGET'
@@ -37,6 +38,7 @@ const errors = {
   TOO_MANY_ARGS: () => `too many args`,
   MISSING_CONFIG_VALUES: () => `missing config values`,
   INVALID_CONFIG_VALUE: (key) => `invalid config value for '${ key }'`,
+  STORE_KEY_ALREADY_EXISTS: (key) => `store named ${ key } already initialized`,
 
   // connect
   MISSING_WRAP_TARGET: () => `missing WrapTarget`,
@@ -56,9 +58,12 @@ const errors = {
 
 export default (...args) => {
   const key = args.shift()
-  throw new Error(
-    errors[key]
-      ? errors[key](...args)
-      : key
-  )
+  const message = errors[key]
+    ? errors[key](...args)
+    : key
+  process.env.NODE_ENV === 'development'
+    ? (() => {
+        throw new Error(message)
+      })()
+    : console.error(message)
 }
