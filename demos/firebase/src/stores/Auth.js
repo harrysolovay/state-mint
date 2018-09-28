@@ -33,7 +33,7 @@ export default class Account {
     }
   }
 
-  registerAuthListeners = () => {
+  registerAuthListener = () => {
     auth().onAuthStateChanged((user) => {
       if (user) {
         this.setState({

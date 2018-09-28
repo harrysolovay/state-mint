@@ -47,7 +47,9 @@ State management and persistence shouldn't require the learning of new conventio
 A breif disclaimer before I dive into shortcomings of popular alternatives: opinionated state management often simplifies debugging and collaboration. Once a project reaches ~5,000 lines, chances are that you're thinking about how to enforce rules for consistency and maintainability. However, you might want to tackle this problem in a way more suited to your project needs and code style. A lot of the time, this will differ from de facto approaches.
 
 ### the history
-Before React came onto the scene, global state management was, for many projects, somewhat of an afterthought. For simple websites, one might hastily throw global state into the window object. Nowadays, for the sake of enabling smooth application evolution, state management needs to eliminate the possibility of accidental overwrites. Redux and React's Context API do this beautifully by making use of ES6 Symbols. Their functional approaches simplify otherwise complex data pipelines, and make it possible to use back-tracking middleware. However, the look of their implementations can be somewhat horrific.
+Before React came onto the scene, global state management was, for many projects, somewhat of an afterthought. For simple websites, one might hastily throw global state into the window object. Nowadays, for the sake of enabling smooth application evolution, state management needs to eliminate the possibility of accidental overwrites. Redux and React's Context API do this beautifully (using singletons and ES6 Symbols). Their functional approaches simplify otherwise complex data pipelines, and make it possible to use back-tracking middleware. However, the look of their implementations can be horrific.
+
+[TODO: EXAMPLE]
 
 ### the horror
 

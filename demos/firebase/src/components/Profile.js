@@ -15,28 +15,31 @@ export default mint(({
       logOut,
     },
   }
-}) => (
-  <div>
-    {
-      loading
-        ? <div>loading profile</div>
-        : <Fragment>
-            {
-              avatar &&
-                <img
-                  src={ avatar }
-                  alt='user avatar'
-                />
-            }
-            {
-              name &&
-                <p children={ `name: ${ name }` } />
-            }
-            {
-              email &&
-                <p children={ `email: ${ email }` } />
-            }
-          </Fragment>
-    }
-  </div>
-), ['auth'])
+}) => {
+  console.log('rendering profile')
+  return (
+    <div>
+      {
+        loading
+          ? <div>loading profile</div>
+          : <Fragment>
+              {
+                avatar &&
+                  <img
+                    src={ avatar }
+                    alt='user avatar'
+                  />
+              }
+              {
+                name &&
+                  <p children={ `name: ${ name }` } />
+              }
+              {
+                email &&
+                  <p children={ `email: ${ email }` } />
+              }
+            </Fragment>
+      }
+    </div>
+  )
+}, ['auth'])

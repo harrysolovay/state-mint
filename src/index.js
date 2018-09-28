@@ -44,7 +44,7 @@ export default (config, ...args) => {
   forOf(config, (key) => {
 
     typeof config[key] !== 'function' &&
-      error(INVALID_CONFIG_VALUE)
+      error(INVALID_CONFIG_VALUE, key)
 
     class Store extends config[key] {
 
@@ -83,7 +83,7 @@ export default (config, ...args) => {
         persist && _referencesState && persist()
 
         const { _subscribers } = this
-        const pending = _subscribers.map((fn) => fn())
+        const pending = _subscribers.map(({ rerender }) => rerender())
         await Promise.all(pending)
 
         callback && callback()
@@ -109,11 +109,11 @@ export default (config, ...args) => {
     !Array.isArray(keys) &&
       error(INVALID_KEYS)
 
-    for (let e of keys) {
+    for (let key of keys) {
       !Object
         .keys(stores)
-        .includes(e) &&
-          error(NONEXISTENT_KEY)
+        .includes(key) &&
+          error(NONEXISTENT_KEY, e)
     }
 
     args.length > 0 &&
@@ -124,8 +124,14 @@ export default (config, ...args) => {
       static displayName =
         `connect(${
           WrapTarget.displayName ||
-          WrapTarget.name
+          WrapTarget.name ||
+          'WrapTarget'
         })`
+
+      $ = new StoreSubgroup(
+        stores,
+        keys,
+      )
 
       rerender = () => (
         new Promise((resolve) => (
@@ -138,14 +144,14 @@ export default (config, ...args) => {
       subscribe = (to = keys) => {
         forEach(to, (key) => {
           stores[key]._subscribers
-            .push(this.rerender)
+            .push(this)
         })
       }
 
       unsubscribe = (from = keys) => {
         forEach(from, (key) => {
           const i = stores[key]._subscribers
-            .indexOf(this.renderer)
+            .indexOf(this)
           stores[key]._subscribers.splice(i, 1)
         })
       }
@@ -158,10 +164,23 @@ export default (config, ...args) => {
       }
 
       render() {
+        const {
+          props, $,
+          rerender,
+          subscribe,
+          unsubscribe,
+        } = this
         return (
           <WrapTarget
-            { ...this.props }
-            $={ new StoreSubgroup(stores, keys) }
+            { ...props }
+            $={{
+              ...$,
+              _: {
+                rerender,
+                subscribe,
+                unsubscribe,
+              },
+            }}
           />
         )
       }

@@ -16,9 +16,7 @@ initializeApp({
 const App = mint(class extends Component {
 
   render() {
-
-    // console.log(this.props.$.auth._parentScope)
-
+    console.log('rendering container')
     return (
       <div>
         <Nav />
@@ -27,10 +25,36 @@ const App = mint(class extends Component {
     )
   }
 
+  // constructor() {
+  //   super()
+  //   console.log('constructing')
+  // }
+
+  // componentWillMount() {
+  //   console.log('component will mount')
+  // }
+
   componentDidMount() {
-    this.props.$.auth.registerAuthListeners()
+    this.props.$.auth.registerAuthListener()
   }
 
+  // componentWillReceiveProps() {
+  //   console.log('component will receive props')
+  // }
+
+  // componentWillUpdate() {
+  //   console.log('component will update')
+  // }
+
+  componentDidUpdate() {
+    console.log('component did update')
+  }
+
+  // componentWillUnmount() {
+  //   console.log('component will unmount')
+  // }
+
 }, ['auth'])
+
 
 render(<App />, document.getElementById('root'));

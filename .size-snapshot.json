@@ -1,0 +1,36 @@
+{
+  "lib/state-mint.cjs.js": {
+    "bundled": 16935,
+    "minified": 8413,
+    "gzipped": 2880
+  },
+  "lib/state-mint.es.js": {
+    "bundled": 16589,
+    "minified": 8145,
+    "gzipped": 2795,
+    "treeshaked": {
+      "rollup": {
+        "code": 283,
+        "import_statements": 234
+      },
+      "webpack": {
+        "code": 1432
+      }
+    }
+  },
+  "lib/state-mint.umd.js": {
+    "bundled": 18874,
+    "minified": 7457,
+    "gzipped": 2718
+  },
+  "state-mint.min.js": {
+    "bundled": 18874,
+    "minified": 7457,
+    "gzipped": 2718
+  },
+  "lib/state-mint.min.js": {
+    "bundled": 18874,
+    "minified": 7457,
+    "gzipped": 2718
+  }
+}

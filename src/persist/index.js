@@ -25,13 +25,14 @@ export default (store, key) => {
 
   const { fromStore, toStore, options } = persist
 
-  if ((fromStore || toStore) && !(fromStore && toStore)) {
-    error(
-      fromStore
-        ? MISSING_TO_STORE
-        : MISSING_FROM_STORE,
-      key,
-    )
+  if (
+    (fromStore || toStore) &&
+    !(fromStore && toStore)
+  ) {
+    fromStore &&
+      error(MISSING_TO_STORE, key)
+    toStore &&
+      error(MISSING_FROM_STORE, key)
   }
 
   const persistMethods = getMethods(
@@ -53,14 +54,16 @@ export default (store, key) => {
           String(fromStore)
             .includes('state')
       ),
-    }
+    },
   )
+
+  // persistMethods.remove(key)
 
   persistMethods.get(key, (data) => {
     if (data) {
       toStore
         ? toStore(data)
-        : store.setState(data)
+        : store.setState({ ...data })
     }
   })
 

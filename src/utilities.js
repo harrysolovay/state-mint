@@ -39,6 +39,18 @@ export const isComponent = (InQuestion: mixed): boolean => {
   )
 }
 
+export const getDependencies = (Component) => {
+
+  if (isFunctionalComponent(Component)) {
+    console.log(String(Component))
+  }
+
+  if (isStatefulComponent(Component)) {
+    console.log(Component)
+  }
+
+}
+
 export const IN_NATIVE: boolean = (
   typeof navigator !== 'undefined' &&
   navigator.product === 'ReactNative'
