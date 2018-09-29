@@ -10,20 +10,26 @@ import error, {
 
 import getMethods from './getMethods'
 
-export default (store, key) => {
+// _persistence = {
+//   should: false,
+//   trigger: () => {} // noop
+//   referencesState: false,
+// }
 
-  const { persist } = store
+export default (store, key, config) => {
 
-  let strategy = typeof persist === 'boolean'
+  console.log(store, key, config)
+
+  const strategy = typeof config === 'boolean'
     ? IN_NATIVE
       ? error(
           MISSING_PERSIST_STRATEGY,
           key,
         )
       : window.localStorage
-    : persist.strategy
+    : config.strategy
 
-  const { fromStore, toStore, options } = persist
+  const { fromStore, toStore, options } = config
 
   if (
     (fromStore || toStore) &&
@@ -40,21 +46,25 @@ export default (store, key) => {
     options,
   )
 
-  store.persist = Object.assign(
-    () => {
-      persistMethods.set(
-        key,
-        fromStore
-          ? fromStore()
-          : store.state
-      )
-    }, {
-      _referencesState: (
+  Object.assign(
+    store._persistence, {
+
+      trigger: () => {
+        persistMethods.set(
+          key,
+          fromStore
+            ? fromStore()
+            : store.state
+        )
+      },
+      
+      referencesState: (
         !fromStore ||
           String(fromStore)
             .includes('state')
       ),
-    },
+
+    }
   )
 
   // persistMethods.remove(key)

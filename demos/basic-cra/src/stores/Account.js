@@ -11,25 +11,27 @@ export default class Account {
 
   someVar = false
 
-  persist = {
+  constructor() {
+    this.persist({
 
-    strategy: window.localStorage,
-
-    fromStore: () => {
-      const { someVar } = this
-      const { bioShowing, ...user } = this.state
-      return { someVar, ...user }
-    },
-
-    toStore: (persistedData) => {
-      const { someVar, ...user } = persistedData
-      this.someVar = someVar
-      this.setState((lastState) => ({
-        ...lastState,
-        ...user,
-      }))
-    },
-
+      strategy: window.localStorage,
+  
+      fromStore: () => {
+        const { someVar } = this
+        const { bioShowing, ...user } = this.state
+        return { someVar, ...user }
+      },
+  
+      toStore: (persistedData) => {
+        const { someVar, ...user } = persistedData
+        this.someVar = someVar
+        this.setState((lastState) => ({
+          ...lastState,
+          ...user,
+        }))
+      },
+  
+    })
   }
 
   logIn = () => {

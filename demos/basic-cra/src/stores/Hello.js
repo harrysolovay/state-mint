@@ -9,11 +9,13 @@ export default class Counter {
   names = NAMES
   state = DEFAULT_STATE
 
-  persist = {
-    strategy: document.cookie,
-    options: {
-      days: 1 / 24 / 60 / 60 * 10 // 10 seconds
-    }
+  constructor() {
+    this.persist({
+      strategy: document.cookie,
+      options: {
+        days: 1 / 24 / 60 / 60 * 10,
+      },
+    })
   }
 
   next = () => {

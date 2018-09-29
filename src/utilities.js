@@ -39,18 +39,20 @@ export const isComponent = (InQuestion: mixed): boolean => {
   )
 }
 
+export const noop = () => {}
+
 // TODO: complete w algorithm
-export const getDependencies = (Component) => {
+// export const getDependencies = (Component) => {
 
-  if (isFunctionalComponent(Component)) {
-    console.log(String(Component))
-  }
+//   if (isFunctionalComponent(Component)) {
+//     console.log(String(Component))
+//   }
 
-  if (isStatefulComponent(Component)) {
-    console.log(Component)
-  }
+//   if (isStatefulComponent(Component)) {
+//     console.log(Component)
+//   }
 
-}
+// }
 
 export const IN_NATIVE: boolean = (
   typeof navigator !== 'undefined' &&
@@ -65,4 +67,8 @@ export class StoreSubgroup {
       }))
     )
   }
+}
+
+export const isConfig = (inQuestion) => {
+  console.log(inQuestion)
 }

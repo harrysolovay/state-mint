@@ -68,7 +68,7 @@
     "typecheck": "node node_modules/.bin/flow",
     "prebuild": "npm run clean",
     "build": "cross-env NODE_ENV=production rollup -c",
-    "doctoc": "doctoc README.md --maxlevel 3 --notitle",
+    "doctoc": "doctoc README.md --maxlevel 2 --notitle",
     "prepublish": "npm run build"
   }
 }

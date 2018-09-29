@@ -1,7 +1,7 @@
 import React from 'react'
 import connect from '../stores'
 
-export default connect(({ $: { counter } }) => {
+const Counter = ({ $: { counter } }) => {
   // console.log('rendering counter')
   return (
     <div>
@@ -16,4 +16,14 @@ export default connect(({ $: { counter } }) => {
       />
     </div>
   )
-}, ['counter'])
+}
+
+Counter.lifeCycle = ({ $ }) => ({
+
+  componentDidMount() {
+    console.log('component mounted', $)
+  },
+
+})
+
+export default connect(Counter, ['counter'])
