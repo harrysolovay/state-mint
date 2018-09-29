@@ -69,6 +69,41 @@ export class StoreSubgroup {
   }
 }
 
-export const isConfig = (inQuestion) => {
-  console.log(inQuestion)
+export const isClass = (InQuestion) => {
+
+  const isConstructor = (
+    InQuestion.constructor &&
+    InQuestion.constructor
+      .toString()
+      .substring(0, 5) === 'class'
+  )
+
+  if (!InQuestion.prototype) {
+    return isConstructor
+  }
+
+  return (
+    InQuestion.prototype &&
+    InQuestion.prototype.constructor &&
+    InQuestion.prototype.constructor.toString &&
+    InQuestion.prototype.constructor
+      .toString()
+      .substring(0, 5) === 'class'
+  )
 }
+
+export const isConfig = (inQuestion) => (
+  typeof inQuestion === 'object' &&
+  (() => {
+    for (let key in inQuestion) {
+      if (
+        inQuestion.hasOwnProperty(key) &&
+        typeof key !== 'string' &&
+        !isClass(inQuestion(key))
+      ) {
+        return false
+      }
+    }
+    return true
+  })()
+)

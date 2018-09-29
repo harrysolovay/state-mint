@@ -199,27 +199,48 @@ const connectCartAndAnalytics = mint({
 
 ```
 
-You can also construct multiple instances of the same store (in this case, asynchronously):
+You can also construct multiple instances of the same store:
 
 `~/src/stores/index.js`
 
 ```js
-import yourAPI from 'some-package'
 import mint from 'state-mint'
 import Participant from './Participant'
 
-const connect = async () => {
-  const players = await yourAPI.fetchPlayers()
-  const config = {}
-  players.forEach((player) => {
+const players = ['a', 'b', 'c']
+  
+const config = {}
+  
+players.forEach((player) => {
+  config[player] = Participant
+})
+  
+export default mint(config)
+```
+
+`~/src/[anywhere else in your app]`
+
+And, you can do it asynchronously:
+
+```js
+import yourAPI from 'some-package'
+import mint from '~/stores'
+import Participant from './Participant'
+
+(async () => {
+
+  const morePlayers = await yourAPI.fetchPlayers()
+  
+  const additions = {}
+  
+  morePlayers.forEach((player) => {
     const key = player.key
-    mintConfig[playerKey] = Participant
+    additions[playerKey] = Participant
   })
-  return mint(config)
-}
-
-export default connect
-
+  
+  mint(morePlayers)
+ 
+})()
 ```
 
 In the example multiple 'Participants' instance example above, we can add even more participants later on. The exported 'connect' function can be used to both connect your components and initialize new stores:

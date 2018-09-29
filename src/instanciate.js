@@ -1,5 +1,5 @@
 import { forOf } from '~/utilities'
-import setPersistence from '~/persist'
+import setPersistence from '~/persistence'
 
 export default (config, stores = {}) => {
   forOf(config, (key) => {
@@ -74,7 +74,6 @@ export default (config, stores = {}) => {
     }
 
     stores[key] = new Store()
-  })
 
-  return stores
+  })
 }

@@ -18,12 +18,12 @@ const Counter = ({ $: { counter } }) => {
   )
 }
 
-Counter.lifeCycle = ({ $ }) => ({
+// Counter.lifeCycle = ({ $ }) => ({
 
-  componentDidMount() {
-    console.log('component mounted', $)
-  },
+//   componentDidMount() {
+//     console.log('component mounted', $)
+//   },
 
-})
+// })
 
 export default connect(Counter, ['counter'])
