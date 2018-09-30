@@ -1,26 +1,26 @@
-import {
-  isConfig,
-  isComponent,
-} from '~/utilities'
-
-import instanciate from './instanciate'
-import consumer from './consumer'
+import instantiate from './instantiate'
+import { isConfig, isComponent } from '~/utilities'
+import wrap from './wrap'
 
 export default (config, ...args) => {
 
   const stores = {}
   
-  instanciate(config, stores)
+  config && instantiate(config, stores)
 
-  return (c, keys) => {
+  const mint = (c, keys) => {
 
-    isConfig(c) &&
-      instanciate(c, stores)
+    if (isConfig(c)) {
+      instantiate(c, stores)
+      return mint
+    }
 
     if (isComponent(c)) {
-      return consumer(stores)(c, keys)
+      return wrap(c, keys, stores)
     }
 
   }
-  
+
+  return mint
+
 }

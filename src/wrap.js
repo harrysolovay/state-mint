@@ -1,14 +1,7 @@
-import React, {
-  Component,
-} from 'react'
+import React, { Component } from 'react'
+import { StoreSubgroup, noop } from '~/utilities'
 
-import {
-  noop,
-  StoreSubgroup,
-  forEach,
-} from '~/utilities'
-
-export default (stores) => (WrapTarget, keys, ...args) => {
+export default (WrapTarget, keys, stores, ...args) => {
 
   const $ = new StoreSubgroup(stores, keys)
 
@@ -44,15 +37,15 @@ export default (stores) => (WrapTarget, keys, ...args) => {
     )
 
     subscribe = (to = keys) => {
-      forEach(to, (key) => {
+      for (let key of to) {
         stores[key]._subscribers[this._key] = this
-      })
+      }
     }
 
     unsubscribe = (from = keys) => {
-      forEach(from, (key) => {
+      for (let key of from) {
         delete stores[key]._subscribers[this._key]
-      })
+      }
     }
 
     getWrapTargetProps = ({ subscribe, unsubscribe } = this) => ({

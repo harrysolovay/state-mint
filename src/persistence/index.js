@@ -10,15 +10,7 @@ import error, {
 
 import getMethods from './getMethods'
 
-// _persistence = {
-//   should: false,
-//   trigger: () => {} // noop
-//   referencesState: false,
-// }
-
 export default (store, key, config) => {
-
-  console.log(store, key, config)
 
   const strategy = typeof config === 'boolean'
     ? IN_NATIVE
