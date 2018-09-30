@@ -1,9 +1,7 @@
-import {
-  storage,
-  asyncStorage,
-  secureStore,
-  cookie,
-} from './methods'
+import storage from './storage'
+import asyncStorage from './asyncStorage'
+import secureStore from './secureStore'
+import cookie from './cookie'
 
 import error, {
   INVALID_PERSIST_STRATEGY,

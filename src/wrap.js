@@ -60,9 +60,7 @@ export default (WrapTarget, keys, stores, ...args) => {
     render() {
       const { getWrapTargetProps } = this
       const props = getWrapTargetProps()
-      return (
-        <WrapTarget { ...props } />
-      )
+      return <WrapTarget { ...props } />
     }
 
     componentDidMount() {

@@ -1,5 +1,5 @@
 import React from 'react'
-import connect from '../stores'
+import mint from 'state-mint'
 
 const Counter = ({ $: { counter } }) => {
   // console.log('rendering counter')
@@ -26,4 +26,4 @@ const Counter = ({ $: { counter } }) => {
 
 // })
 
-export default connect(Counter, ['counter'])
+export default mint(Counter, ['counter'])

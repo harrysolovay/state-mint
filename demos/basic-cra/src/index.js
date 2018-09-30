@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import './stores'
 import { Account, Counter, Hello } from './components'
 import { render } from 'react-dom'
 

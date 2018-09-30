@@ -2,7 +2,7 @@ import instantiate from './instantiate'
 import { isConfig, isComponent } from '~/utilities'
 import wrap from './wrap'
 
-export default (config, ...args) => {
+const mint = (config, ...args) => {
 
   const stores = {}
   
@@ -24,3 +24,6 @@ export default (config, ...args) => {
   return mint
 
 }
+
+export default mint()
+export { mint as init }

@@ -1,7 +1,7 @@
 import React from 'react'
-import connect from '../stores'
+import mint from 'state-mint'
 
-export default connect(({ $: { hello } }) => {
+export default mint(({ $: { hello } }) => {
   // console.log('rendering account')
   return (
     <div>

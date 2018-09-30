@@ -4,7 +4,7 @@ import Account from './Account'
 import Counter from './Counter'
 import Hello from './Hello'
 
-export default mint({
+mint({
   account: Account,
   counter: Counter,
   hello: Hello,
