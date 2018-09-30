@@ -18,12 +18,16 @@ const Counter = ({ $: { counter } }) => {
   )
 }
 
-// Counter.lifeCycle = ({ $ }) => ({
+Counter.lifeCycleHooks = ({ $ }) => ({
 
-//   componentDidMount() {
-//     console.log('component mounted', $)
-//   },
+  constructor() {
+    console.log('constructing', $)
+  },
 
-// })
+  componentDidMount() {
+    console.log('component mounted', $)
+  },
+
+})
 
 export default mint(Counter, ['counter'])

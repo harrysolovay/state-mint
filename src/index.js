@@ -16,7 +16,7 @@ const mint = (config, ...args) => {
     }
 
     if (isComponent(c)) {
-      return wrap(c, keys, stores)
+      return wrap(c, stores, keys)
     }
 
   }

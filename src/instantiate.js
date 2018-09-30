@@ -1,7 +1,6 @@
 import setPersistence from '~/persistence'
 
-export default (config, stores = {}) => {
-  console.log(config)
+export default (config, stores) => {
   for (let key in config) {
     if (config.hasOwnProperty(key)) {
 

@@ -1,32 +1,18 @@
 import React, { Component } from 'react'
 import { StoreSubgroup, noop } from '~/utilities'
 
-export default (WrapTarget, keys, stores, ...args) => {
+export default (Target, stores, keys) => {
 
   const $ = new StoreSubgroup(stores, keys)
+  let hooks = {}
 
   return class extends Component {
 
     static displayName =
       `connect(${
-        WrapTarget.displayName ||
-        WrapTarget.name ||
-        'WrapTarget'
+        Target.displayName ||
+        Target.name || 'Target'
       })`
-
-    lifeCycle = {
-      // mounting
-      constructor: noop,
-      // getDerivedStateFromProps: noop,
-      componentDidMount: noop,
-      // updating
-      shouldComponentUpdate: noop,
-      render: noop,
-      getSnapshotBeforeUpdate: noop,
-      componentDidUpdate: noop,
-      // unmounting
-      componentWillUnmount: noop,
-    }
 
     rerender = () => (
       new Promise((resolve) => (
@@ -48,29 +34,74 @@ export default (WrapTarget, keys, stores, ...args) => {
       }
     }
 
-    getWrapTargetProps = ({ subscribe, unsubscribe } = this) => ({
-      ...this.props,
-      $: {
-        ...$,
+    getTargetProps = () => {
+
+      const {
+        props,
         subscribe,
+        rerender,
         unsubscribe,
-      },
-    })
+      } = this
+
+      return {
+        ...props,
+        $: {
+          ...$,
+          subscribe,
+          rerender,
+          unsubscribe,
+        },
+      }
+    }
+
+    constructor() {
+      super()
+
+      const { lifeCycleHooks } = Target
+      const { getTargetProps } = this
+
+      hooks = Object.assign({},
+        ...{
+          constructor: noop,
+          componentDidMount: noop,
+          shouldComponentUpdate: () => true,
+          componentDidUpdate: noop,
+          componentWillUnmount: noop,
+        },
+        lifeCycleHooks
+          ? lifeCycleHooks(
+              getTargetProps()
+            )
+          : {}
+      )
+
+      hooks.constructor()
+    }
 
     render() {
-      const { getWrapTargetProps } = this
-      const props = getWrapTargetProps()
-      return <WrapTarget { ...props } />
+      const { getTargetProps } = this
+      const props = getTargetProps()
+      return <Target { ...props } />
     }
 
     componentDidMount() {
       this.mounted = true
       this.subscribe()
+      hooks.componentDidMount()
+    }
+
+    shouldComponentUpdate() {
+      return hooks.shouldComponentUpdate()
+    }
+
+    componentDidUpdate() {
+      hooks.componentDidUpdate()
     }
 
     componentWillUnmount() {
       this.mounted = false
       this.unsubscribe()
+      hooks.componentWillUnmount()
     }
   }
 }
