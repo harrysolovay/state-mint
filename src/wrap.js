@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import {
   isStatefulComponent,
+  isFunctionalComponent,
   StoreSubgroup,
   createUniqueId,
   noop,
@@ -15,10 +16,39 @@ export default (Target, stores, keys) => {
   error(shouldThrow, 'LIFECYCLE_HOOKS_IN_STATEFUL_COMPONENT')
 
   if (!keys) {
-    const fnAsString = String(Target)
-    keys = Object
-      .keys(stores)
-      .filter((key) => fnAsString.includes(`$.${ key }`))
+
+    let analyze = []
+
+    if (isStatefulComponent(Target)) {
+      const proto = Target.prototype
+      const contained = Object
+        .getOwnPropertyNames(proto)
+        .map((key) => proto[key])
+      analyze = [ ...analyze, ...contained ]
+      console.log(analyze)
+    }
+
+    if (isFunctionalComponent(Target)) {
+      let contained = [ Target ]
+      if (Target.lifeCycleHooks) {
+        const mock = Target.lifeCycleHooks({ $: {} })
+        contained = [ ...contained, ...Object.values(mock) ]
+      }
+      analyze = [ ...analyze, ...contained ]
+    }
+
+    const allKeys = Object.keys(stores)
+    
+    keys = analyze.map((e) => {
+      const asString = String(e)
+      for (let key of allKeys) {
+        if (asString.includes(`$.${ key }`)) {
+          return key
+        }
+      }
+      return
+    }).filter(Boolean)
+
   }
 
   const $ = new StoreSubgroup(stores, keys)
