@@ -9,4 +9,4 @@ cache:
   directories:
   - node_modules
 script: 
-  - yarn flow
+  - yarn build

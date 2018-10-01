@@ -7,7 +7,6 @@ export default (config, stores) => {
     if (config.hasOwnProperty(key)) {
 
       error(!!stores[key], 'STORE_KEY_ALREADY_EXISTS')
-      error(!!!typeof stores[key] === 'function', 'INVALID_STORE')
 
       class Store extends config[key] {
 
@@ -47,7 +46,7 @@ export default (config, stores) => {
             lastState,
             typeof updater === 'function'
               ? updater(lastState)
-              : updater
+              : updater,
           )
     
           const a = JSON.stringify(lastState)

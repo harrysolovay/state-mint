@@ -1,6 +1,4 @@
-// flow
-
-export const isFunctionalComponent = (InQuestion: mixed): boolean => {
+export const isFunctionalComponent = (InQuestion) => {
   if (!InQuestion) return false
   const inQuestionAsString = String(InQuestion)
   return (
@@ -10,7 +8,7 @@ export const isFunctionalComponent = (InQuestion: mixed): boolean => {
   )
 }
 
-export const isStatefulComponent = (InQuestion: mixed): boolean => {
+export const isStatefulComponent = (InQuestion) => {
   if (!InQuestion) return false
   return (
     InQuestion.prototype &&
@@ -18,7 +16,7 @@ export const isStatefulComponent = (InQuestion: mixed): boolean => {
   )
 }
 
-export const isComponent = (InQuestion: mixed): boolean => {
+export const isComponent = (InQuestion) => {
   return (
     isFunctionalComponent(InQuestion) ||
     isStatefulComponent(InQuestion)
@@ -27,13 +25,13 @@ export const isComponent = (InQuestion: mixed): boolean => {
 
 export const noop = () => {}
 
-export const IN_NATIVE: boolean = (
+export const IN_NATIVE = (
   typeof navigator !== 'undefined' &&
   navigator.product === 'ReactNative'
 )
 
 export class StoreSubgroup {
-  constructor(stores: {}, keys: Array<string>) {
+  constructor(stores, keys) {
     Object.assign(this,
       ...keys.map((key) => ({
         [key]: stores[key],
@@ -42,7 +40,7 @@ export class StoreSubgroup {
   }
 }
 
-export const isClass = (InQuestion: mixed): boolean => (
+export const isClass = (InQuestion) => (
   InQuestion.prototype
     ? (
         InQuestion.prototype.constructor &&
@@ -59,7 +57,7 @@ export const isClass = (InQuestion: mixed): boolean => (
       )
 )
 
-export const isConfig = (inQuestion: mixed): boolean => {
+export const isConfig = (inQuestion) => {
   for (let key in inQuestion) {
     if (
       inQuestion.hasOwnProperty(key) &&
@@ -78,16 +76,3 @@ export const createUniqueId = () => (
     .toString(16)
     .substring(1)
 )
-
-// TODO: complete w algorithm
-// export const getDependencies = (Component) => {
-
-//   if (isFunctionalComponent(Component)) {
-//     console.log(String(Component))
-//   }
-
-//   if (isStatefulComponent(Component)) {
-//     console.log(Component)
-//   }
-
-// }

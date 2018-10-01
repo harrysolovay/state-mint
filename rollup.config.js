@@ -33,6 +33,7 @@ const globals = {
   '@babel/runtime/helpers/inheritsLoose': '_inheritsLoose',
   '@babel/runtime/helpers/assertThisInitialized': '_assertThisInitialized',
   '@babel/runtime/helpers/defineProperty': '_defineProperty',
+  '@babel/runtime/helpers/wrapNativeSuper': '_wrapNativeSuper',
 }
 
 export default (() => {
@@ -95,6 +96,7 @@ export default (() => {
             file: pkg.unpkg,
             format: 'umd',
             name: 'StateMint',
+            exports: 'named',
             globals,
           },
           external,
@@ -113,6 +115,7 @@ export default (() => {
             file: 'lib/state-mint.min.js',
             format: 'umd',
             name: 'StateMint',
+            exports: 'named',
             globals,
           },
           external,
