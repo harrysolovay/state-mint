@@ -1,8 +1,13 @@
+import error from '~/errors'
 import setPersistence from '~/persistence'
 
 export default (config, stores) => {
+
   for (let key in config) {
     if (config.hasOwnProperty(key)) {
+
+      error(!!stores[key], 'STORE_KEY_ALREADY_EXISTS')
+      error(!!!typeof stores[key] === 'function', 'INVALID_STORE')
 
       class Store extends config[key] {
 
@@ -16,7 +21,7 @@ export default (config, stores) => {
           })
 
           this.persistence &&
-            setPersistence(this, key) 
+            setPersistence(this, key)
 
         }
 

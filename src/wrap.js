@@ -12,8 +12,20 @@ let shouldThrow = false
 
 export default (Target, stores, keys) => {
 
-  shouldThrow = !!(isStatefulComponent(Target) && Target.lifeCycleHooks)
-  error(shouldThrow, 'LIFECYCLE_HOOKS_IN_STATEFUL_COMPONENT')
+  error(
+    !!(isStatefulComponent(Target) && Target.lifeCycleHooks),
+    'LIFECYCLE_HOOKS_IN_STATEFUL_COMPONENT',
+  )
+
+  const allStoreKeys = Object.keys(stores)
+
+  if (keys) {
+    error(!Array.isArray(keys), 'STORE_KEYS_INVALID')
+    for (let key of keys) {
+      error(typeof key !== 'string', 'STORE_KEY_INVALID')
+      error(!allStoreKeys.includes(key), 'STORE_KEY_DNE')
+    }
+  }
 
   if (!keys) {
 
@@ -36,12 +48,10 @@ export default (Target, stores, keys) => {
       }
       analyze = [ ...analyze, ...contained ]
     }
-
-    const allKeys = Object.keys(stores)
     
     keys = analyze.map((e) => {
       const asString = String(e)
-      for (let key of allKeys) {
+      for (let key of allStoreKeys) {
         if (asString.includes(`$.${ key }`)) {
           return key
         }
@@ -102,8 +112,11 @@ export default (Target, stores, keys) => {
       }
     }
 
-    constructor() {
+    constructor(props) {
       super()
+
+      const { $ } = props
+      error(!!$, 'OVERRIDING_STORES')
 
       this._key = createUniqueId()
 
