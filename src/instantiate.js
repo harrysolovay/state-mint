@@ -60,10 +60,8 @@ export default (config, stores) => {
           this.state = newState
     
           const { persist } = this
-          if (persist) {
-            const { _referencesState } = persist
-            _referencesState && persist()
-          }
+          persist && persist._referencesState &&
+            persist()
     
           await this.rerender()
     
