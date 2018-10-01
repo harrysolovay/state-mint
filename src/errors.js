@@ -56,14 +56,64 @@ const errors = {
   
 }
 
+
+class TraceableError extends Error {
+  constructor(...args) {
+    super(...args)
+    const { captureStackTrace } = Error
+    captureStackTrace &&
+      captureStackTrace(this, TraceableError)
+  }
+}
+
+
 export default (...args) => {
-  const key = args.shift()
-  const message = errors[key]
-    ? errors[key](...args)
-    : key
-  process.env.NODE_ENV === 'development'
-    ? (() => {
-        throw new Error(message)
-      })()
-    : console.error(message)
+
+  console.log(...args)
+
+  let message
+  let condition = true
+
+  switch (args.length) {
+
+    case 0: break
+
+    case 1: {
+      
+      const e = args.shift()
+
+      message = errors[e]
+        ? errors[e]()
+        : e
+
+      break
+    }
+
+    default: {
+
+      let e = args.shift()
+
+      if (typeof e === 'boolean') {
+        if (!e) condition = false
+        e = args.shift()
+      }
+      message = errors[e]
+        ? errors[e](...args)
+        : e
+
+      break
+    }
+
+  }
+
+  if (condition) {
+    process.env.NODE_ENV === 'development'
+      ? (() => {
+          const error = new TraceableError(message)
+          error.name = '`state-mint` usage error'
+          throw error
+        })()
+      : console.error(message)
+  }
+
 }

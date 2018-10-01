@@ -12,4 +12,4 @@ export default mint(({ $: { hello } }) => {
       <span children={ hello.state.currentName } />
     </div>
   )
-}, ['hello'])
+})

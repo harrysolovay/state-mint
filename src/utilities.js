@@ -72,6 +72,13 @@ export const isConfig = (inQuestion: mixed): boolean => {
   return typeof inQuestion === 'object'
 }
 
+export const createUniqueId = () => (
+  Math
+    .floor((1 + Math.random()) * 0x1000000)
+    .toString(16)
+    .substring(1)
+)
+
 // TODO: complete w algorithm
 // export const getDependencies = (Component) => {
 

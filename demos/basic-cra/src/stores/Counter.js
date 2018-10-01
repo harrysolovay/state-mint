@@ -6,9 +6,7 @@ export default class Counter {
 
   state = DEFAULT_STATE
 
-  constructor() {
-    this.persist({ strategy: window.sessionStorage })
-  }
+  persistence = { strategy: window.sessionStorage }
 
   increment = () => {
     this.setState(({ count }) => ({ count: ++count }))

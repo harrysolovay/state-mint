@@ -1,8 +1,8 @@
 import instantiate from './instantiate'
-import { isConfig, isComponent } from '~/utilities'
+import { isComponent, isConfig } from '~/utilities'
 import wrap from './wrap'
 
-const mint = (config, ...args) => {
+const init = (config, ...args) => {
 
   const stores = {}
   
@@ -10,20 +10,20 @@ const mint = (config, ...args) => {
 
   const mint = (c, keys) => {
 
+    if (isComponent(c)) {
+      return wrap(c, stores, keys)
+    }
+
     if (isConfig(c)) {
       instantiate(c, stores)
       return mint
     }
 
-    if (isComponent(c)) {
-      return wrap(c, stores, keys)
-    }
-
   }
 
   return mint
-
+  
 }
 
-export default mint()
-export { mint as init }
+export default init()
+export { init }

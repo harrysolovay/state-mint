@@ -30,4 +30,4 @@ Counter.lifeCycleHooks = ({ $ }) => ({
 
 })
 
-export default mint(Counter, ['counter'])
+export default mint(Counter)

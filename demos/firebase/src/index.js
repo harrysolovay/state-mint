@@ -1,6 +1,7 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { initializeApp } from 'firebase'
-import mint from './stores'
+import './stores'
+import mint from 'state-mint'
 import { Nav, Profile } from './components'
 import { render } from 'react-dom'
 
@@ -13,48 +14,35 @@ initializeApp({
   messagingSenderId: '166771682305',
 })
 
-const App = mint(class extends Component {
+const App = () => (
+  <div>
+    <Nav />
+    <Profile />
+  </div>
+)
 
-  render() {
-    console.log('rendering container')
-    return (
-      <div>
-        <Nav />
-        <Profile />
-      </div>
-    )
-  }
+App.lifeCycleHooks = ({ $ }) => ({
 
-  // constructor() {
-  //   super()
-  //   console.log('constructing')
-  // }
-
-  // componentWillMount() {
-  //   console.log('component will mount')
-  // }
+  constructor() {
+    console.log('constructor')
+  },
 
   componentDidMount() {
-    this.props.$.auth.registerAuthListener()
-  }
-
-  // componentWillReceiveProps() {
-  //   console.log('component will receive props')
-  // }
-
-  // componentWillUpdate() {
-  //   console.log('component will update')
-  // }
+    $.auth.registerAuthListener()
+    console.log('component did mount')
+  },
 
   componentDidUpdate() {
     console.log('component did update')
-  }
+  },
 
-  // componentWillUnmount() {
-  //   console.log('component will unmount')
-  // }
+  componentWillUnmount() {
+    console.log('component will unmount')
+  },
 
-}, ['auth'])
+})
+
+const MintedApp = mint(App, ['auth'])
 
 
-render(<App />, document.getElementById('root'));
+render(<MintedApp />, document.getElementById('root'));

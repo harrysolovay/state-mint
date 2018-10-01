@@ -14,7 +14,7 @@
     "indent": 0,
     "quotes": 0,
     "semi": [ 1, "never" ],
-    "max-len": [1, 100, 2],
+    "max-len": 0,
     "object-curly-spacing": [1, "always"],
     "flowtype/no-types-missing-file-annotation": 0,
     "flowtype-errors/show-errors": 1,

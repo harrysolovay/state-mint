@@ -59,4 +59,4 @@ export default mint(({ $: { account } }) => {
       </div>
     </div>
   )
-}, ['account'])
+})

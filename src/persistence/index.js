@@ -1,67 +1,50 @@
-import {
-  IN_NATIVE,
-} from '~/utilities'
-
 import error, {
   MISSING_PERSIST_STRATEGY,
   MISSING_TO_STORE,
   MISSING_FROM_STORE,
 } from '~/errors'
-
+import { IN_NATIVE } from '~/utilities'
 import getMethods from './getMethods'
 
-export default (store, key, config) => {
+let shouldThrow = false
 
-  const strategy = typeof config === 'boolean'
-    ? IN_NATIVE
-      ? error(
-          MISSING_PERSIST_STRATEGY,
-          key,
-        )
-      : window.localStorage
-    : config.strategy
+export default (store, key) => {
 
-  const { fromStore, toStore, options } = config
+  const { persistence } = store
 
-  if (
-    (fromStore || toStore) &&
-    !(fromStore && toStore)
-  ) {
-    fromStore &&
-      error(MISSING_TO_STORE, key)
-    toStore &&
-      error(MISSING_FROM_STORE, key)
+  const noConfig = typeof persistence === 'boolean'
+
+  shouldThrow = noConfig && IN_NATIVE
+  error(shouldThrow, MISSING_PERSIST_STRATEGY, key)
+
+  const strategy = noConfig
+    ? window.localStorage
+    : persistence.strategy
+
+  const { fromStore, toStore, options } = persistence
+
+  if ((fromStore || toStore) && !(fromStore && toStore)) {
+    error(!!fromStore, MISSING_TO_STORE, key)
+    error(!!toStore, MISSING_FROM_STORE, key)
   }
 
-  const persistMethods = getMethods(
-    strategy,
-    options,
-  )
+  const { get, set } = getMethods(strategy, options, key)
 
-  Object.assign(
-    store._persistence, {
+  store.persist = Object.assign(() => {
+    set( key,
+      fromStore
+        ? fromStore()
+        : { ...store.state },
+    )
+  }, {
+    _ReferencesState: (
+      !fromStore ||
+      String(fromStore)
+        .includes('state')
+    )
+  })
 
-      trigger: () => {
-        persistMethods.set(
-          key,
-          fromStore
-            ? fromStore()
-            : store.state
-        )
-      },
-      
-      referencesState: (
-        !fromStore ||
-          String(fromStore)
-            .includes('state')
-      ),
-
-    }
-  )
-
-  // persistMethods.remove(key)
-
-  persistMethods.get(key, (data) => {
+  get(key, (data) => {
     if (data) {
       toStore
         ? toStore(data)

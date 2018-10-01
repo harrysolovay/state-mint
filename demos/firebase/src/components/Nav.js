@@ -1,5 +1,5 @@
 import React from 'react'
-import mint from '../stores'
+import mint from 'state-mint'
 
 export default mint(({
   $: {
@@ -13,7 +13,6 @@ export default mint(({
     }
   }
 }) => {
-  console.log('rendering nav')
   return (
     <div>
       {
@@ -35,7 +34,7 @@ export default mint(({
       }
     </div>
   )
-}, ['auth'])
+})
 
 // export default mint((props) => (
 //   <div>

@@ -1,10 +1,28 @@
 import React, { Component } from 'react'
-import { StoreSubgroup, noop } from '~/utilities'
+import {
+  isStatefulComponent,
+  StoreSubgroup,
+  createUniqueId,
+  noop,
+} from '~/utilities'
+import error from '~/errors'
+
+let shouldThrow = false
 
 export default (Target, stores, keys) => {
 
+  shouldThrow = !!(isStatefulComponent(Target) && Target.lifeCycleHooks)
+  error(shouldThrow, 'LIFECYCLE_HOOKS_IN_STATEFUL_COMPONENT')
+
+  if (!keys) {
+    const fnAsString = String(Target)
+    keys = Object
+      .keys(stores)
+      .filter((key) => fnAsString.includes(`$.${ key }`))
+  }
+
   const $ = new StoreSubgroup(stores, keys)
-  let hooks = {}
+  const hooks = {}
 
   return class extends Component {
 
@@ -57,10 +75,14 @@ export default (Target, stores, keys) => {
     constructor() {
       super()
 
+      this._key = createUniqueId()
+
+      this.subscribe()
+
       const { lifeCycleHooks } = Target
       const { getTargetProps } = this
 
-      hooks = Object.assign({},
+      Object.assign(hooks,
         ...{
           constructor: noop,
           componentDidMount: noop,
@@ -86,7 +108,6 @@ export default (Target, stores, keys) => {
 
     componentDidMount() {
       this.mounted = true
-      this.subscribe()
       hooks.componentDidMount()
     }
 

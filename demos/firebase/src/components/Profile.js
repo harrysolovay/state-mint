@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react'
-import mint from '../stores'
+import mint from 'state-mint'
 
 export default mint(({
   $: {
@@ -16,7 +16,6 @@ export default mint(({
     },
   }
 }) => {
-  console.log('rendering profile')
   return (
     <div>
       {
@@ -42,4 +41,4 @@ export default mint(({
       }
     </div>
   )
-}, ['auth'])
+})

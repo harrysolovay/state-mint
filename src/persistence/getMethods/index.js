@@ -1,67 +1,46 @@
 import storage from './storage'
 import asyncStorage from './asyncStorage'
 import secureStore from './secureStore'
+import error, { INVALID_PERSIST_STRATEGY } from '~/errors'
 import cookie from './cookie'
 
-import error, {
-  INVALID_PERSIST_STRATEGY,
-} from '~/errors'
 
-export default (strategy, options) => {
+const isAsyncStorage = ({ setItem, getItem, removeItem }) =>
+  setItem && getItem && removeItem
 
-  const { constructor: { name: baseClassName } } = strategy
+const isSecureStore = ({ setItemAsync, getItemAsync, deleteItemAsync }) =>
+  setItemAsync && getItemAsync && deleteItemAsync
 
-  switch (baseClassName) {
+const isCookie = (inQuestion) =>
+  inQuestion === document.cookie
+
+
+export default (strategy, options, key) => {
+
+  const { constructor: { name } } = strategy
+
+  switch (name) {
 
     case 'Storage': {
       return storage(strategy)
     }
 
     case 'Object': {
-
-      if (
-        strategy.setItem &&
-        strategy.getItem &&
-        strategy.removeItem
-      ) {
-        return asyncStorage(strategy)
-      }
-
-      if (
-        strategy.setItemAsync &&
-        strategy.getItemAsync &&
-        strategy.deleteItemAsync
-      ) {
-        return secureStore(
-          strategy,
-          options,
-        )
-      }
-
-      return error(
-        INVALID_PERSIST_STRATEGY,
-        baseClassName,
-      )
+      return isAsyncStorage(strategy)
+        ? asyncStorage(strategy)
+        : isSecureStore(strategy)
+          ? secureStore( strategy, options)
+          : error(INVALID_PERSIST_STRATEGY, key)
     }
 
     case 'String': {
-
-      if (strategy === document.cookie) {
-        return cookie(strategy, options)
-      }
-
-      return error(
-        INVALID_PERSIST_STRATEGY,
-        baseClassName,
-      )
+      return isCookie(strategy)
+        ? cookie(strategy, options)
+        : error(INVALID_PERSIST_STRATEGY, key)
     }
 
     default: {
-
-      return error(
-        INVALID_PERSIST_STRATEGY,
-        baseClassName,
-      )
+      return error(INVALID_PERSIST_STRATEGY, key)
     }
   }
 }

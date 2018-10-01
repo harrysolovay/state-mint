@@ -12,7 +12,7 @@ export default class Account {
 
   state = { ...DEFAULT_STATE }
 
-  persist = true
+  persistence = true
 
   logIn = async () => {
     this.setState({ loading: true })
