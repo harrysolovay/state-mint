@@ -46,24 +46,75 @@
 <hr />
 
 > **A state layer that keeps your React project fresh 🌿**
-> Designed for React developers, State Mint combines a boilerplate-free, functionally-aware state management experience with spectacular performance and must-have features. Click [here](https://reactjs.org/docs/render-props.html) to read about the process of creating State Mint, and about its future direction (feel free to PR).
+> Designed for React developers, State Mint is a boilerplate-free state management and persistence solution with spectacular performance and the best-available developer experience. Click [here](https://reactjs.org/docs/render-props.html) to read about the process of creating State Mint, and about its future direction (feel free to PR).
+
+<details>
+<summary>view minimal example implementation</summary>
+
+```js
+import React from 'react'
+import mint from 'state-mint'
+import { render } from 'react-dom'
+
+// define the store as an ES6 class:
+class ModalStore {
+  
+  state = { showingModal: false }
+    
+  toggleModal = () =>
+    this.setState({
+      showingModal: !this.showingModal,
+    })
+    
+}
+
+// 'mint' your store(s)
+mint({ modal: ModalStore })
+
+// define a component that uses the 'modal' store (props.$.modal)
+const UnconnectedModal = (props) => {
+  const { $: { modal } } = props
+  const { state: { showingModal }, toggleModal } = modal
+  return (
+    <div>
+      { showingModal && <div>modal contents</div> }
+      <button onClick={ toggleModal }>
+      	{ showingModal ? 'hide' : 'show' }
+      </button>
+    </div>
+  )
+}
+
+// 'mint' a component...
+// because `UnconnectedModal` references props.$.modal,
+// State Mint will––when connecting the component)––infer
+// that your Component should rerender on ('or subscribe to')
+// state changes in the modal store
+const ConnectedModal = mint(UnconnectedModal)
+
+render(<ConnectedModal />, document.getElementById('root'))
+```
+
+</details>
 
 ## Highlights
 - 🤯 use all features without visibly touching more than a single, one-parameter function from this library
 
-- 🧛‍♂️ highly configurable (or near-zero-config) data persistence with [session storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage), [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) and [cookies](https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie) on web, and [async storage](https://facebook.github.io/react-native/docs/asyncstorage) and [secure store](https://docs.expo.io/versions/latest/sdk/securestore) on React Native
+- 🧛‍♂️ highly configurable data persistence with [session storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage), [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) and [cookies](https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie) on web, and [async storage](https://facebook.github.io/react-native/docs/asyncstorage) and [secure store](https://docs.expo.io/versions/latest/sdk/securestore) on React Native
 
-- 👂 components are intelligently subscribed to listen for changes in the data they reference (or, optionally specify subscriptions)
+- 👂 components are intelligently subscribed to listen for changes in the data they reference (or, you can specify subscriptions)
 
-- 🎯 stores can directly access oneanother with the '$' instance variable (a pointer to the parent scope, and therefore a direct reference to other stores, including their subscribed components' rerender triggers)
+- 🎯 stores can directly access oneanother's data (define store data relative to other stores, trigger rerenders of subscribed components, ... even subscribe stores to other stores!)
 
-- 🎩 providers and their store instances can both be initialized asynchronously
+- 🎩 store instances can be initialized and connected to components asynchronously
 
 - 😷 keep your state safe from direct mutation with a re-implemented, data-persisting setState, which can be used identically to React's Component.setState
 
-- 🎣 add lifecycle hooks to functional components with no added overhead (no additional HOC)
+- 🎣 add lifecycle hooks to functional components with no additional HOC
 
   **other things that're good to have...**
+
+- 🔐 Flow & TypeScript typings
 
 - 👩‍👧‍👦 no dependencies
 
@@ -98,19 +149,19 @@ yarn add state-mint
 
 ### build formats
 
-* CJS (CommonJS)
+CommonJS
 
 ```js
 const mint = require('state-mint').default
 ```
 
-* ESM (EcmaScript Module)
+ES Module
 
 ```js
 import mint from 'state-mint'
 ```
 
-* UMD (Universal Module Definition)
+UMD
 
 ```js
 var mint = window.StateMint.default
@@ -121,12 +172,11 @@ var mint = window.StateMint.default
 
 ```jsx
 import React from 'react'
-import { render } from 'react-dom'
-// import the default-exported function
 import mint from 'state-mint'
+import { render } from 'react-dom'
 
 // define your store class
-// (use state & setState to trigger the rerendering of subscribed components)
+// setState will trigger rerenders when & where appropriate
 class Counter {
 
   state = { count: 0 }
@@ -139,12 +189,11 @@ class Counter {
 
 }
 
-// 'mint' function takes in an object with keyed store classes...
-// minting (initializing) your stores (returns a 'connect' function)
-const connect = mint({ counter: Counter })
+// 'mint' takes in an object with keyed store classes...
+mint({ counter: Counter })
 
-// create a component that uses the counter stores
-const App = (props) => {
+// once the store has been initialized ^, use mint again to wrap a component that uses the counter store
+const App = mint((props) => {
 
   const { $: { counter }} = props
   const { state: { count }, increment, decrement } = counter
@@ -156,175 +205,44 @@ const App = (props) => {
       <button onClick={ increment }>increment</button>
     </div>
   )
-}
+})
 
-// connect the component to your store(s)
-const ConnectedApp = connect(App)
-
-render(<ConnectedApp />, document.getElementById('root'))
+render(<App />, document.getElementById('root'))
 
 ```
 
-To use the counter store in other modules, simply, export the connect function and re-import from wherever your components need connecting. Don't worry about overriding the store instance. That being said, be aware that you can create separate containers:
+To use the counter store in other modules, import 'mint' again and wrap the component that needs access:
 
-`~/src/stores/index.js`
+`some-other-file.js`
 
-```js
+```jsx
 import mint from 'state-mint'
-import Auth from './Auth'
-import Feed from './Feed'
-import Cart from './Cart'
-import Analytics from './Analytics'
 
-// this creates a single connector for your four stores:
-
-const connect = mint({
-  auth: Auth,
-  feed: Feed,
-  cart: Cart,
-  analytics: Analytics,
+const AnotherCounterComponent = mint((props) => {
+  const { $: { counter: { state: { count } } } }
+  return <div>{ count }</div>
 })
-
-// optionally, you can break it up into separate connectors:
-
-const connectAuthAndFeed = mint({
-  auth: Auth,
-  feed: Feed,
-})
-
-const connectCartAndAnalytics = mint({
-  cart: Cart,
-  analytics: Analytics,
-})
-
 ```
 
-You can also construct multiple instances of the same store:
-
-`~/src/stores/index.js`
+Asynchronously:
 
 ```js
+import yourAPI from '...'
 import mint from 'state-mint'
-import Participant from './Participant'
+import ParticipantStore from '~/stores'
 
-const players = ['a', 'b', 'c']
+yourAPI.fetchPlayers().then((players) => {
+
+  let additions = {}
   
-const config = {}
-  
-players.forEach((player) => {
-  config[player] = Participant
-})
-  
-export default mint(config)
-```
-
-`~/src/[anywhere else in your app]`
-
-And, you can do it asynchronously:
-
-```js
-import yourAPI from 'some-package'
-import mint from '~/stores'
-import Participant from './Participant'
-
-(async () => {
-
-  const morePlayers = await yourAPI.fetchPlayers()
-  
-  const additions = {}
-  
-  morePlayers.forEach((player) => {
-    const key = player.key
-    additions[playerKey] = Participant
+  players.forEach((player) => {
+    additions[player.id] = ParticipantStore
   })
   
   mint(morePlayers)
- 
-})()
+  
+})
 ```
-
-In the example multiple 'Participants' instance example above, we can add even more participants later on. The exported 'connect' function can be used to both connect your components and initialize new stores:
-
-`~/src/index.js`
-
-```jsx
-import connect from '~/src/stores'
-import { SomeComponent } from '~/src/components'
-import soonToBeInitialized from '~/src/stores/InitLaterOn'
-
-// connecting component
-const SmartComponent = connect(SomeComponent)
-
-// initializing new stores
-connect({ soonToBeInitialized: Uninitialized })
-```
-
-
-For the cleanest DX, I recommend organizing your project similarly to this:
-
-`~/src/stores/Counter.js`
-
-```js
-export default class Counter {
-
-  state = { count: 0 }
-
-  increment = () =>
-    this.setState({ count: this.state.count + 1 })
-
-  decrement = () =>
-    this.setState({ count: this.state.count - 1 })
-
-}
-```
-
-`~/src/stores/index.js`
-
-```js
-import Counter from './Counter'
-
-export default mint({ counter: Counter })
-```
-
-`~/src/components/Counter.js`
-
-```jsx
-import React from 'react'
-
-export default (props) => {
-
-  const { $: { counter }} = props
-  const { state: { count }, increment, decrement } = counter
-
-  return (
-    <div>
-      <button onClick={ decrement }>decrement</button>
-      <span>{ count }</span>
-      <button onClick={ increment }>increment</button>
-    </div>
-  )
-}
-```
-
-`~/src/components/index.js`
-
-```js
-export { default as Counter } from './Counter'
-```
-
-`~/src/index.js`
-
-```jsx
-import React from 'react'
-import connect from '~/src/stores'
-import { Counter } from '~/src/components'
-import { render } from 'react-dom'
-
-const App = connect(Counter)
-
-render(<App />, document.getElementById(root))
-```
-
 
 ## Why?
 
@@ -389,15 +307,15 @@ export default class Counter {
   state = { count: 0 }
 
   increment = () => {
-    this.setState((lastState) => ({
-    	count: lastState.count + 1,
-    }))
+​    this.setState((lastState) => ({
+​    	count: lastState.count + 1,
+​    }))
   }
 
   decrement = () => {
-    this.setState((lastState) => ({
-    	count: lastState.count - 1,
-    }))
+​    this.setState((lastState) => ({
+​    	count: lastState.count - 1,
+​    }))
   }
 
 }
@@ -407,7 +325,7 @@ export default class Counter {
 
 `~/src/index.js`
 
-```jsx
+​```jsx
 import React from 'react'
 // we'll define this component in the next step:
 import CounterComponent from './components/Counter.js'
@@ -566,6 +484,7 @@ export default class Account {
 ```
 
 ### trigger persist manually:
+
 with each setState call, your data will be persisted if the following conditions are true:
 
 * the newState is different from the lastState
@@ -605,23 +524,13 @@ export default class SomeToggle {
 
 
 
-## FAQ (or infrequently / never yet asked)
+## FAQ
 
-### How can I use `setState` without extending another class where `setState` is defined?
+**Q)** How can I use `setState` in my store without extending another class where `setState` is defined?<br />
+**A)** Before `mint` constructors your store, the `setState` method is attached to the class prototype (precompiled, it defines a new class that extends yours). Although your class doesn't have a setState method upon its initial definition, it will upon runtime.
 
-Before your store is constructed, the `setState` method is attached to the class prototype.
-
-### But, is it slow to attach the `setState` method to each store class prototype?
-
-No, quite the oposite actually. When you inherit from a class with a pre-defined method, the inheritence chain (contrary to what you might think) is not precompiled. This means that inheriting will result in a series of checks helper and functions being executed at runtime. It's lighter to attach the `setState` method.
-
-### Why does it use React's Context API?
-
-For the sake of not overestimating my foresight. Athough I might soon ditch the Context API, therefore making this library work in projects using a version of React below 16.3, as well as for non-react projects!
-
-### What's next?
-
-I want to create a `babel-plugin-state-mint` package that allows you to use statemint with even less code. You would decorate your store class, which would make it available to your components. Within a component, you could simply reference `this.props.stores.storeName` or `props.stores.storeName`, and the plugin would (behind the scenes) 'mint' the component with the storeKeys that it referenced. It would also find the lowest-level node that contains all store-referencing components, and 'mint' it with all of the decorated stores. I want 'mint' to be the only export ever needed from the `state-mint` package.
+**Q)** Why doesn't it use React's Context API?<br />
+**A)** While React@^16.3 Context is polyfilled for older versions or react, I wanted State Mint to work without the version or peer dependency. Plus, using React Context would be overkill. Context Providers rerender all children upon any state change (no faster paints). By saving a given store's subscriber components' references, the door is open to more customization of behavior.
 
 ## LICENSE
 

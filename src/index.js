@@ -1,28 +1,40 @@
+import error, {
+  TOO_MANY_ARGS,
+  INVALID_PROVIDE_ARGS,
+  MISSING_MINT_ARGS,
+  INVALID_MINT_ARGS,
+} from '~/errors'
 import instantiate from './instantiate'
 import { isComponent, isConfig } from '~/utilities'
 import wrap from './wrap'
-import error from '~/errors'
 
-const init = (config) => {
+const provide = (config, ...args) => {
+
+  error(args.length >= 1, TOO_MANY_ARGS)
 
   const stores = {}
+  let consumers = []
   
-  config && instantiate(config, stores)
+  if (config) {
+    error(!isConfig(config), INVALID_PROVIDE_ARGS)
+    instantiate(config, stores)
+  }
 
   const mint = (c, keys, ...args) => {
 
-    error(!!!c, 'MISSING_MINT_CONFIG_OR_TARGET')
+    error(!!!c, MISSING_MINT_ARGS)
+    error(args.length >= 1, TOO_MANY_ARGS)
 
     if (isComponent(c)) {
-      return wrap(c, stores, keys)
+      return wrap(stores, consumers, c, keys)
     }
 
     if (isConfig(c)) {
-      instantiate(c, stores)
+      instantiate(stores, consumers, c)
       return mint
     }
 
-    error('INVALID_MINT_CONFIG')
+    error(INVALID_MINT_ARGS)
 
   }
 
@@ -30,5 +42,5 @@ const init = (config) => {
 
 }
 
-export default init()
-export { init }
+export default provide()
+export { provide }

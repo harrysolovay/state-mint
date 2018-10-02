@@ -1,12 +1,12 @@
-import error from '~/errors'
+import error, { STORE_KEY_ALREADY_EXISTS } from '~/errors'
 import setPersistence from '~/persistence'
 
-export default (config, stores) => {
+export default (stores, consumers, config) => {
 
   for (let key in config) {
     if (config.hasOwnProperty(key)) {
 
-      error(!!stores[key], 'STORE_KEY_ALREADY_EXISTS')
+      error(!!stores[key], STORE_KEY_ALREADY_EXISTS)
 
       class Store extends config[key] {
 
@@ -72,6 +72,11 @@ export default (config, stores) => {
 
       stores[key] = new Store()
 
+      if (consumers.length >= 1) {
+        for (let consumer of consumers) {
+          consumer.onNewStore()
+        }
+      }
     }
   }
 }

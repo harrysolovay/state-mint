@@ -1,3 +1,27 @@
+export const noop = () => {}
+
+export const IN_NATIVE =
+  navigator && navigator.product === 'ReactNative'
+
+
+export const isClass = (InQuestion) =>
+  !!InQuestion.constructor
+
+export const isConfig = (inQuestion) => {
+  if (typeof inQuestion !== 'object') {
+    return false
+  }
+  for (let key in inQuestion) {
+    if (inQuestion.hasOwnProperty(key)) {
+      if (!isClass(inQuestion[key])) {
+        return false
+      }
+    }
+  }
+  return true
+}
+
+
 export const isFunctionalComponent = (InQuestion) => {
   if (!InQuestion) return false
   const inQuestionAsString = String(InQuestion)
@@ -8,67 +32,29 @@ export const isFunctionalComponent = (InQuestion) => {
   )
 }
 
-export const isStatefulComponent = (InQuestion) => {
-  if (!InQuestion) return false
-  return (
-    InQuestion.prototype &&
-    InQuestion.prototype.isReactComponent
-  )
-}
-
-export const isComponent = (InQuestion) => {
-  return (
-    isFunctionalComponent(InQuestion) ||
-    isStatefulComponent(InQuestion)
-  )
-}
-
-export const noop = () => {}
-
-export const IN_NATIVE = (
-  typeof navigator !== 'undefined' &&
-  navigator.product === 'ReactNative'
-)
-
-export class StoreSubgroup {
-  constructor(stores, keys) {
-    Object.assign(this,
-      ...keys.map((key) => ({
-        [key]: stores[key],
-      }))
-    )
-  }
-}
-
-export const isClass = (InQuestion) => (
-  InQuestion.prototype
+export const isStatefulComponent = (InQuestion) => (
+  InQuestion
     ? (
-        InQuestion.prototype.constructor &&
-        InQuestion.prototype.constructor.toString &&
-        InQuestion.prototype.constructor
-          .toString()
-          .substring(0, 5) === 'class'
+        InQuestion.prototype &&
+        InQuestion.prototype.isReactComponent
       )
-    : (
-        InQuestion.constructor &&
-        InQuestion.constructor
-          .toString()
-          .substring(0, 5) === 'class'
-      )
+    : false
 )
 
-export const isConfig = (inQuestion) => {
-  for (let key in inQuestion) {
-    if (
-      inQuestion.hasOwnProperty(key) &&
-      typeof key !== 'string' &&
-      !isClass(inQuestion(key))
-    ) {
-      return false
-    }
-  }
-  return typeof inQuestion === 'object'
-}
+export const isComponent = (InQuestion) => (
+  isFunctionalComponent(InQuestion) ||
+  isStatefulComponent(InQuestion)
+)
+
+
+export const getStoreSubgroup = (stores, keys) => (
+  Object.assign({},
+    ...keys.map((key) => ({
+      [key]: stores[key],
+    }))
+  )
+)
+
 
 export const createUniqueId = () => (
   Math

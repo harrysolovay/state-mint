@@ -64,7 +64,7 @@
     "clean": "rimraf lib",
     "prestart": "npm run clean",
     "start": "cross-env NODE_ENV=development rollup -c -w",
-    "demo": "npm run start --prefix demos/firebase",
+    "demo": "npm run start --prefix demos/basic-cra",
     "typecheck": "node node_modules/.bin/flow",
     "prebuild": "npm run clean",
     "build": "cross-env NODE_ENV=production rollup -c",

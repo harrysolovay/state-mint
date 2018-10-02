@@ -6,16 +6,13 @@ import error, {
 import { IN_NATIVE } from '~/utilities'
 import getMethods from './getMethods'
 
-let shouldThrow = false
-
 export default (store, key) => {
 
   const { persistence } = store
 
   const noConfig = typeof persistence === 'boolean'
 
-  shouldThrow = noConfig && IN_NATIVE
-  error(shouldThrow, MISSING_PERSIST_STRATEGY, key)
+  error(noConfig && IN_NATIVE, MISSING_PERSIST_STRATEGY, key)
 
   const strategy = noConfig
     ? window.localStorage
@@ -37,11 +34,11 @@ export default (store, key) => {
         : { ...store.state },
     )
   }, {
-    _ReferencesState: (
+    _referencesState: (
       !fromStore ||
       String(fromStore)
         .includes('state')
-    )
+    ),
   })
 
   get(key, (data) => {

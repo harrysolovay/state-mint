@@ -27,6 +27,7 @@
     }],
     "eol-last": [2, "never"],
     "no-var": 0,
-    "no-invalid-this": 0
+    "no-invalid-this": 0,
+    "array-bracket-spacing": 0
   }
 }

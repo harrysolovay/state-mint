@@ -2,34 +2,34 @@ import React, { Component } from 'react'
 import {
   isStatefulComponent,
   isFunctionalComponent,
-  StoreSubgroup,
-  createUniqueId,
+  getStoreSubgroup,
   noop,
 } from '~/utilities'
-import error from '~/errors'
+import error, {
+  LIFECYCLE_HOOKS_ON_STATEFUL,
+  INVALID_STORE_KEYS,
+  NONEXISTENT_STORE_KEY,
+  OVERRIDING_$_PROP,
+  INVALID_LIFECYCLE_HOOKS,
+} from '~/errors'
 
-let shouldThrow = false
-
-export default (Target, stores, keys) => {
+export default (stores, consumers, Target, keys) => {
 
   error(
     !!(isStatefulComponent(Target) && Target.lifeCycleHooks),
-    'LIFECYCLE_HOOKS_IN_STATEFUL_COMPONENT',
+    LIFECYCLE_HOOKS_ON_STATEFUL,
   )
 
-  const allStoreKeys = Object.keys(stores)
-
   if (keys) {
-    error(!Array.isArray(keys), 'STORE_KEYS_INVALID')
+    error(!Array.isArray(keys), INVALID_STORE_KEYS)
     for (let key of keys) {
-      error(typeof key !== 'string', 'STORE_KEY_INVALID')
-      error(!allStoreKeys.includes(key), 'STORE_KEY_DNE')
+      error(!Object.keys(stores).includes(key), NONEXISTENT_STORE_KEY)
     }
   }
 
   if (!keys) {
 
-    let analyze = []
+    var analyze = []
 
     if (isStatefulComponent(Target)) {
       const proto = Target.prototype
@@ -37,7 +37,6 @@ export default (Target, stores, keys) => {
         .getOwnPropertyNames(proto)
         .map((key) => proto[key])
       analyze = [ ...analyze, ...contained ]
-      console.log(analyze)
     }
 
     if (isFunctionalComponent(Target)) {
@@ -48,20 +47,22 @@ export default (Target, stores, keys) => {
       }
       analyze = [ ...analyze, ...contained ]
     }
-    
-    keys = analyze.map((e) => {
-      const asString = String(e)
-      for (let key of allStoreKeys) {
-        if (asString.includes(`$.${ key }`)) {
-          return key
+
+    var inferSubscriptions = () => {
+      const allStoreKeys = Object.keys(stores)
+      return analyze.map((e) => {
+        const asString = String(e)
+        for (let key of allStoreKeys) {
+          if (asString.includes(`$.${ key }`)) {
+            return key
+          }
         }
-      }
-      return
-    }).filter(Boolean)
+        return null
+      }).filter(Boolean)
+    }
 
   }
 
-  const $ = new StoreSubgroup(stores, keys)
   const hooks = {}
 
   return class extends Component {
@@ -72,6 +73,15 @@ export default (Target, stores, keys) => {
         Target.name || 'Target'
       })`
 
+    bridge = () => {
+      const subscriptions = inferSubscriptions
+        ? inferSubscriptions()
+        : keys
+      const $ = getStoreSubgroup(stores, subscriptions)
+      Object.assign(this, { subscriptions, $ })
+      return subscriptions
+    }
+
     rerender = () => (
       new Promise((resolve) => (
         this.mounted
@@ -80,13 +90,15 @@ export default (Target, stores, keys) => {
       ))
     )
 
-    subscribe = (to = keys) => {
+    subscribe = (to) => {
+      if (!to) to = this.bridge()
       for (let key of to) {
         stores[key]._subscribers[this._key] = this
       }
     }
 
-    unsubscribe = (from = keys) => {
+    unsubscribe = (from) => {
+      if (!from) from = this.subscriptions
       for (let key of from) {
         delete stores[key]._subscribers[this._key]
       }
@@ -95,7 +107,7 @@ export default (Target, stores, keys) => {
     getTargetProps = () => {
 
       const {
-        props,
+        props, $,
         subscribe,
         rerender,
         unsubscribe,
@@ -112,18 +124,31 @@ export default (Target, stores, keys) => {
       }
     }
 
+    onNewStore = () => {
+      const { mounted, subscriptions } = this
+      if (mounted && !keys && subscriptions) {
+        const { subscribe, rerender } = this
+        subscribe()
+        subscriptions !== this.subscriptions &&
+          rerender()
+      }
+    }
+
     constructor(props) {
       super()
 
-      const { $ } = props
-      error(!!$, 'OVERRIDING_STORES')
-
-      this._key = createUniqueId()
+      let { $ } = props
+      error(!!$, OVERRIDING_$_PROP)
 
       this.subscribe()
 
       const { lifeCycleHooks } = Target
       const { getTargetProps } = this
+
+      error(
+        !!(lifeCycleHooks && typeof lifeCycleHooks !== 'function'),
+        INVALID_LIFECYCLE_HOOKS
+      )
 
       Object.assign(hooks,
         ...{
@@ -139,6 +164,8 @@ export default (Target, stores, keys) => {
             )
           : {}
       )
+
+      consumers.push(this)
 
       hooks.constructor()
     }
