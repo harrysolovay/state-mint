@@ -104,7 +104,7 @@ render(<ConnectedModal />, document.getElementById('root'))
 
 - 🎩 store instances can be initialized and connected to components asynchronously • new stores will (with zero extra configuration) collect subscriptions from previously-initialized components that reference the new store
 
-- 😷 keep your state safe from direct mutation with a re-implemented, data-persisting setState, which can be used identically to React's Component setState
+- 😷 keep your state safe from direct mutation with a re-implemented, data-persisting `setState`, which can be used identically to React's Component setState
 
 - 🎣 add lifecycle hooks to functional components with no additional HOC
 
@@ -218,7 +218,7 @@ render(<App />, document.getElementById('root'))
 
 ```
 
-To use the counter store above in other modules, import `mint` again and wrap the component that needs access:
+To use the `counter` store above in other modules, import `mint` again and wrap the component that needs access:
 
 `some-other-file.js`
 
@@ -237,7 +237,7 @@ const AnotherCounterComponent = mint((props) => {
 
 ### the ideal
 
-State management and persistence shouldn't require the learning of new conventions or nitty-gritty persistence implementations; React developers are familiar with HOCs (higher-order components) and Component.setState. State management libraries should allow implementations to involve as little library code as possible, and allow users to focus on defining their data and actions, without excessive boilerplate or 3rd-party plugins and middleware.
+State management and persistence shouldn't require the learning of new conventions and repetitive persistence implementations; React developers are familiar with [HOCs (higher-order components)](https://reactjs.org/docs/higher-order-components.html) and [`setState`](https://reactjs.org/docs/react-component.html#setstate). State management libraries should allow implementations to involve as little library code as possible, and allow users to focus on defining their data and actions, without excessive boilerplate or 3rd-party plugins and middleware.
 
 ### the reality
 
@@ -245,23 +245,23 @@ Opinionated state management often simplifies debugging and collaboration. Once 
 
 ### the history
 
-Before React came onto the scene, global state management was, for many projects, somewhat of an afterthought. For simple websites, one might hastily throw global state into the window object. Nowadays, for the sake of enabling smoother application evolution, state management needs to eliminate the possibility of overwrites––usually through careful scoping or synthetic immutability ("synthetic" because JavaScript is not a functional programming language). State management also needs to be 'binding' or 'reactive' (kept in sync with the user interface). Tools that take a functional approach to state management can simplify otherwise complex data pipelines, and make it possible to use back-tracking middleware (not to mention keep you safe from stack trace hell). This is a big part of Redux's success. However, the look of Redux and other existing state solutions is... [pause]... horrific.
+Before React came onto the scene, global state management was, for many projects, somewhat of an afterthought. For simple websites, one might hastily throw global state into the window object. Nowadays, for the sake of enabling smoother application evolution, state management needs to eliminate the possibility of overwrites––usually through careful scoping or synthetic immutability ("synthetic" because JavaScript is not a functional programming language). State management also needs to be 'binding' or 'reactive' (kept in sync with the user interface). Tools that take a functional approach to state management can simplify otherwise complex data pipelines, and make it possible to use back-tracking middleware (not to mention keep you safe from stack trace hell). This is a big part of Redux's success. However, the look of Redux and other common solutions can be horrific.
 
 ### the horror
 
 ***[Redux](https://github.com/reduxjs/redux) :*** Conventional Redux requires that you separate action types from their logic, logic from its data, and data from its triggering of subsequent actions. Depending on how you like to work, this decoupling is either the best or the worst approach (if you lay in the middle, chances are [you might not need Redux](https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367) – written by the creator himself).
 
-***[MobX](https://github.com/mobxjs/mobx):*** comes in a few different flavors. Classic MobX is a step in a more intuitive and object-oriented direction. On the downside, it forces users to specify which store members are observable, which is a new convention (in React, by default, a Component's state member is observable, and using setState will trigger a rerender that uses the new state). This being said, the new convention does lead to a performance gain by haulting unnecessary rerenders in your DOM tree. MobX encourages explicit mutation of observable data, which is a React anti-pattern.
+***[MobX](https://github.com/mobxjs/mobx):*** comes in a few different flavors. Classic MobX is a step in a more intuitive and object-oriented direction. On the downside, it forces users to specify which store members are observable, which is a new convention (in React, by default, a Component instance's state member is observable, and using setState will trigger a rerender that uses the new state). This being said, the new convention does lead to a performance gain by haulting unnecessary rerenders in your DOM tree. One pitfall is that MobX encourages explicit mutation of observable data, which is a React anti-pattern.
 
-***[MobX State Tree](https://github.com/mobxjs/mobx-state-tree)*** has the best of both mutability and immutability (reactive variable assignment, back-tracking & snapshot debugging). It let's you nest store data in a way that scales, and your models always stay in sync... but it has the age-old pitfall of too-many opinions. Its specific opinions might resonate with you, although there's definitely a learning curve. It doesn't follow suit with React as a platform that enourages heuristics.
+***[MobX State Tree](https://github.com/mobxjs/mobx-state-tree)*** has the best of both mutability and immutability (reactive variable assignment, back-tracking & snapshot debugging). It let's you nest store data in a way that scales, and your models always stay in sync... but it has the age-old pitfall of too-many opinions. Its specific opinions might resonate with you, although there's definitely a learning curve. However, it doesn't follow suit with React as a platform that enourages heuristics.
 
-***[Apollo Link State](https://github.com/apollographql/apollo-link-state):*** If your app interfaces with a GraphQL server, this could be a good solution. The Apollo ecosystem is vibrant and rapidly evolving. Apollo Link State gives users a strong API for syncing fetched data in memory and offline persistence. However, it's also very opinionated, and unless you're already using Apollo Client, it probably isn't the best solution.
+***[Apollo Link State](https://github.com/apollographql/apollo-link-state):*** If your app interfaces with a GraphQL server, this could be a good solution. The Apollo ecosystem is vibrant and rapidly-growing. Apollo Link State gives users a strong API for syncing fetched data in memory and offline persistence. However, it's also very opinionated, and unless you're already using Apollo Client, it probably isn't the best solution.
 
-***[Unstated](https://unstated.io):*** as far as alternatives go, Unstated is the least opinionated with the lowest learning curve. The underlaying mechanism is pretty cool: behind the scenes, stores are initialized inside a React Context Consumer, which then passes the store data to its parent provider, which then passes the data to all store Consumers. This pattern is cool, but a little hackey, and results in extra operations with each update. It also means you need to use the Store contructor as a key to the instance (an extra import and a lack of support for multiple instances of the same store). Another disadvantage is that (without a custom HOC) data can only be accessed within a render method (aka. can't use stores in lifecycle methods).
+***[Unstated](https://unstated.io):*** as far as alternatives go, Unstated is the least opinionated with the lowest learning curve. The underlaying mechanism is pretty cool: behind the scenes, stores are initialized inside a React Context Consumer, which then passes the store data to its parent provider, which then passes the data to all store Consumers. This pattern is very creative (deconstructing it was a fun puzzle), but it is a little hackey, and results in extra operations with each update. It also means you need to use the Store contructor as a key to the instance (an extra import and a lack of support for multiple instances of the same store). Another disadvantage is that (without a custom HOC) data can only be accessed within a render method (aka. can't use stores in lifecycle methods).
 
-### Enter StateMint
+### enter State Mint
 
-State Mint allows developers to establish fully-featured, complex, data flows with as little library code as possible. Its usage involves a single function that both initializes stores and connects components to the stores they reference. It's hard to emphasize enough that **this is the cleanest state management developer experience**, hands-down.
+State Mint allows developers to establish fully-featured, complex, data flows with as little library code as possible. A value of heuristics, simplicity and flexibility are at the core of its design. Its usage involves a single function that both initializes stores and connects components to the stores they reference. It's hard to emphasize enough that **this is the cleanest state management developer experience**, hands-down.
 
 ## Overview
 
@@ -280,11 +280,11 @@ State Mint allows developers to establish fully-featured, complex, data flows wi
 The name was selected as it relates to the idea of an industrial facility that manufactures coins
 > "Mint: a place where money is coined, especially under state authority" (dictionary.com)
 
-While it is a nice play on words (especially relating to React.setState), the term "mint" also suggests something to the effect of governing (digital) assets. All-in-all, I believe it's a good fit for this library, and could be adopted by others as a term for describing the instanciation of data stores.
+While it is a nice play on words (especially relating to `setState`), the term "mint" also suggests something to the effect of governing (digital) assets. All-in-all, I believe it's a good fit for this library, and could be adopted by others as a term for describing the instanciation of data stores.
 
 ### minting stores
 
-Stores are defined as ES6 classes, and then "minted" with the default-exported function of the `state-mint` package. By passing your stores to that `mint` function, the stores get extended with the setState method, along with performance enhancements, persistence features, and more. The extended class is then instanciated and placed appropriately within a scope that can only be accessed by a minted component. This prevents accidental overwrites and other conflicts.
+Stores are defined as ES6 classes, and then "minted" with the default-exported function of the `state-mint` package. By passing your stores to that `mint` function, the stores get extended with the `setState` method, along with performance enhancements, (if configured) persistence features, subscriber controls and more. The extended class is then instanciated and placed appropriately within a scope that can only be accessed by a minted component. This prevents accidental overwrites and other conflicts.
 
 ```js
 import mint from 'state-mint'
@@ -293,8 +293,7 @@ class MyStore {
   state = { whosStore: 'mine' }
 }
 
-// this mints one instance,
-// with a key of 'my'
+// this mints one instance, with a key of 'my'
 mint({ my: MyStore })
 ```
 
@@ -361,7 +360,7 @@ const Header = mint((props) => (
 
 ### subscription inference
 
-In the vast majority of use cases, subscription inference will work equally-well. The underlaying operations involve converting your component and any lifecycle methods or hooks to strings, and and then parsing out whether a given store is referenced. Don't worry about the effects of destructuring or other syntactical abstractions of the reference.
+In the vast majority of use cases, subscription inference will work equally-well. The underlaying operations involve converting your component and any lifecycle methods or hooks to strings, and and then parsing out whether a given store is referenced.
 
 ```js
 import mint from 'state-mint'
@@ -369,6 +368,26 @@ import mint from 'state-mint'
 const Header = mint((props) => (
   <header>
     <span>{ props.$.storeKey.state.headerText }</span>
+  </header>
+))
+```
+
+Don't worry about the effects of destructuring or other syntactical abstractions of the reference:
+
+```js
+import mint from 'state-mint'
+
+const Header = mint(({
+  $: {
+    storeKey: {
+      state: {
+        headerText,
+      }
+    }
+  }
+}) => (
+  <header>
+    <span>{ headerText }</span>
   </header>
 ))
 ```
@@ -393,7 +412,7 @@ const Countdown = mint((props) => {
 
 ## Persistence
 
-Configure persistence by setting the 'persistence' instance variable within your store class. Different stores can use different strategies. You can only use one strategy per-store.
+Configure persistence by setting the 'persistence' instance variable within your store class. Different stores can use different strategies. However, you can only use one strategy per-store.
 
 ### options
 
@@ -497,7 +516,7 @@ export default class Counter {
 }
 ```
 
-### Specify what data to persist
+### specify what data to persist
 
 We don't always want to persist the entire state, and sometimes we want to persist data outside of state (instance variables). Be careful though, persisting functions will result in an error (as they cannot be converted to JSON).
 
@@ -560,7 +579,7 @@ export default class Account {
 
 ### manually trigger a persistent save
 
-Often times, you'll want to persist your data independent of state, or application memory for that matter. By defining fromStore & toStore, you can establish the flow of data in and out of persistent storage. From this flow, State Mint checks to see if persistent storage references state at all. If it does, then calling setState will trigger a persistent save. Otherwise, setState will leave persistent storage untouched. Aka., you can stop using setState if the only class features you're using are instance variables and State Mint's persistence; manually trigger a persistent save by calling `this.persist` with no arguments from within your store class. It won't trigger a re-render, but it will save the data to your chosen or the default strategy.
+Often times, you'll want to persist your data independent of state, or application memory for that matter. By defining fromStore & toStore, you can establish the flow of data in and out of persistent storage. From this flow, State Mint checks to see if persistent storage references state at all. If it does, then calling setState will trigger a persistent save. Otherwise, setState will leave persistent storage untouched. Aka., you can stop using setState if the only class features you're using are instance variables and persistence; manually trigger a persistent save by calling `this.persist` with no arguments from within your store class. It won't trigger a re-render, but it will save the data to your chosen or the default strategy.
 
 ```diff
 export default class SomeToggle {
@@ -594,12 +613,7 @@ export default class SomeToggle {
 
 ## Lifecycle hooks
 
-State Mint makes use of the [higher-order component (HOC) pattern](https://reactjs.org/docs/higher-order-components.html) for which the React team advocates. Because of the use of stateful HOCs, there's little reason to define your wrapped component as also stateful. Instead, boost performance by using using minted stores (instead of local state) and adding lifecycle hooks as a static property of your (newly) functional component.
-
-<details>
-<summary>architectural sidenote</summary>
-For the time being, using HOCs seems to be the safest way to compose user-defined components that access a state-dependent assortment of stores and settings. However, in my experimentation, I did find another pattern which performs better for the wrapping of stateful components: the wrapping function could extend a new class with the user-defined component (which extends React.Component). Inside of this newly-generated class, ES6 symbols would be used to mask private properties of the wrapper. This way, there's no overriding of props.
-</details>
+State Mint makes use of the [higher-order component (HOC) pattern](https://reactjs.org/docs/higher-order-components.html) for which the React team advocates. Because of the use of stateful HOCs, there's little reason to define your wrapped component as also stateful. Instead, boost performance by using minted stores (instead of local state) and adding lifecycle hooks as a static property of your (newly) functional component.
 
 ```jsx
 import mint from 'state-mint'
@@ -632,6 +646,12 @@ Counter.lifeCycleHooks = ({ $ }) => ({
 
 export default mint(Counter)
 ```
+<br />
+
+<details>
+<summary>architectural sidenote</summary>
+For the time being, using HOCs seems to be the safest way to compose user-defined components with a library-defined component (consumer-specific settings and rerender trigger). However, in my experimentation, I did find another pattern which performs better for the creation of store-consuming components: the component "minter" could extend a new class with the user-defined component (which extends React.Component). Inside of this newly-generated class, ES6 symbols would be used to mask private properties of the wrapper. This way, there's no overriding of props. Although I see no pitfalls, this is advised against. That advisement most likely has to do with the fact that synthetic inheritence shards a few levels deep. Best not to confuse JavaScript with fully-object-oriented languages.
+</details>
 
 Now, when you use the Counter component, the constructor and componentDidMount hooks will be triggered from the stateful component in which it is contained.
 
