@@ -63,7 +63,7 @@ class ModalStore {
     
   toggleModal = () =>
     this.setState({
-      showingModal: !this.showingModal,
+      showingModal: !this.state.showingModal,
     })
     
 }
@@ -71,9 +71,7 @@ class ModalStore {
 // 'mint' your store(s)
 mint({ modal: ModalStore })
 
-// define and 'mint' a component that uses the 'modal' store...
-// because the component references the 'modal' store, changes to
-// modal store state will trigger a rerender
+// 'mint' your component(s) that uses your store(s) ('modal', in this case)...
 const Modal = mint((props) => {
   const showingModal = props.$.modal.state.showingModal
   const toggleModal = props.$.modal.toggleModal
@@ -87,21 +85,24 @@ const Modal = mint((props) => {
   )
 })
 
+// ^ because the component references the 'modal' store,
+// changes to the modal store's state will trigger a rerender
+
 render(<ConnectedModal />, document.getElementById('root'))
 ```
 
 </details>
 
 ## Highlights
-- 🤯 **simplicity** • use all features without visibly touching more than a single, one-parameter function from this library
+- 🤯 use all features without visibly touching more than a single, one-parameter function from this library
 
-- 🧛‍♂️ **persistence** • highly configurable data persistence with [session storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage), [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) and/or [cookies](https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie) on web, and [async storage](https://facebook.github.io/react-native/docs/asyncstorage) and/or [secure store](https://docs.expo.io/versions/latest/sdk/securestore) on React Native
+- 🧛‍♂️ highly configurable data persistence with [session storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage), [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) and/or [cookies](https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie) on web, and [async storage](https://facebook.github.io/react-native/docs/asyncstorage) and/or [secure store](https://docs.expo.io/versions/latest/sdk/securestore) on React Native
 
-- 👂 **subscription inference** • components are intelligently subscribed to listen for changes in the stores they reference (or, you can specify subscriptions)
+- 👂 subscription inference: components are intelligently subscribed to listen for changes in the stores they reference (or, you can specify subscriptions)
 
-- 🎯 **store-to-store communcation** • stores can directly access oneanother's data
+- 🎯 stores can directly access oneanother (easy side-effects)
 
-- 🎩 **timing isn't everything** • store instances can be initialized and connected to components asynchronously • new stores will (with zero extra configuration) collect subscriptions from previously-initialized components that reference the new store
+- 🎩 store instances can be initialized and connected to components asynchronously • new stores will (with zero extra configuration) collect subscriptions from previously-initialized components that reference the new store
 
 - 😷 keep your state safe from direct mutation with a re-implemented, data-persisting setState, which can be used identically to React's Component.setState
 
@@ -138,27 +139,37 @@ render(<ConnectedModal />, document.getElementById('root'))
 
 ## Installation
 
-### available through the NPM registry
+### availability
+
+#### [NPM Registry](https://www.npmjs.com/package/state-mint)
 
 ```sh
-yarn add state-mint
+npm i state-mint
+```
+
+#### [unpkg](https://unpkg.com/state-mint)
+
+```html
+<!-- loads minified UMD build -->
+<script src='https://unpkg.com/state-mint'></script>
 ```
 
 ### build formats
 
-ES Module
+#### ES Module
 
 ```js
 import mint from 'state-mint'
 ```
 
-CommonJS
+#### CommonJS
 
-```js
-const mint = require('state-mint').default
+```diff
+- const mint = require('state-mint')
++ const mint = require('state-mint').default
 ```
 
-UMD
+#### UMD
 
 ```js
 var mint = window.StateMint.default
@@ -256,7 +267,7 @@ Before React came onto the scene, global state management was, for many projects
 
 3. Use the `mint` function again to wrap your components, thereby subscribing them to the stores they reference.
 
-... feel free to switch up steps 2 and 3
+> by all means switch up steps 2 and 3
 
 ## Minting
 
@@ -378,9 +389,35 @@ const Countdown = mint((props) => {
 
 ## Persistence
 
-### Default settings
+Configure persistence by setting the 'persistence' instance variable within your store class. Different stores can use different strategies. You can only use one strategy per-store.
 
-By default, persistence is disabled. To enable persistence without configuration, simply set an instance variable `persist` to `true`. Every time the state changes, it will be persisted with localStorage (set strategy in React Native).
+### options
+
+**strategy:** the storage provider you wish to use –– available strategies are...
+
+* [session storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage)
+* [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage)
+* [cookies](https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie)
+* [async storage](https://facebook.github.io/react-native/docs/asyncstorage)
+* [secure store](https://docs.expo.io/versions/latest/sdk/securestore)
+
+> defaults to `window.localStorage` in web and `null` in React Native
+
+**fromStore:** function that collects data into and returns the object you wish to persist; gathers data from memory whenever persistent save is triggered
+
+> defaults to null
+
+**toStore:** function used upon initialization to hydrate store with persisted data (takes in a single argument: the persisted object returned from fromStore); toStore should re-set state and re-assign instance variables based on the persisted data
+
+> defaults to null
+
+**options:** usage of this property depends on how you want the given persistence strategy to behave (strategy-specific). To use the `document.cookie` strategy with a one-week expiration, set `persistence.options` to `{ days: 7 }`
+
+> defaults to null
+
+### auto-config
+
+By default, persistence is disabled. To enable persistence without configuration, simply set the `persist` instance variable to `true`. Every time the state changes, it will be persisted with localStorage (must set strategy in React Native).
 
 ```diff
 export default class Counter {
@@ -402,9 +439,9 @@ export default class Counter {
 }
 ```
 
-### Custom strategy
+### setting to a non-default strategy
 
-To use another persist strategy, set persist to an object containing a `strategy` prop. Assign `strategy` to the strategy you wish to use (current options: localStorage, sessionStorage, document.cookie, AsyncStorage, and SecureStore).
+To use another persistence strategy, set persistence to an object containing a `strategy` prop. Assign to it the strategy you wish to use.
 
 ```diff
 export default class Counter {
@@ -594,6 +631,84 @@ export default mint(Counter)
 
 Now, when you use the Counter component, the constructor and componentDidMount hooks will be triggered from the stateful component in which it is contained.
 
+### Provide
+
+Although left unhighlighted for the sake of simplicity, the `state-mint` package does have a named export `provide`, which allows you to create a new `minter` (new stores scope). It's useful to think about this using classical state management terms such as provider and consumer. Until this point in the documentation, the line between provider and consumer is blurry; the default-exported function has been used both to initialize stores and to connect components to those stores. This is incredibly useful in lowering the learning curve, but it doesn't result in awareness of a more advanced and potentially (depending on your project) deliberate pattern: instead of importing the default export (a pre-initialized provider), import the named export `provide`, which allows you to initialize your own providers:
+
+`~/src/stores/index.js`
+
+```js
+import { provide } from 'state-mint'
+
+import Auth from './Auth'
+import Feed from './Feed'
+import Cart from './Cart'
+import Analytics from './Analytics'
+
+export default provide({
+  auth: Auth,
+  feed: Feed,
+  cart: Cart,
+  analytics: Analytics,
+})
+```
+> note: you can initialize a provider with no stores
+
+Now, instead of importing `mint` from the `state-mint` package, import `mint` from where you defined your provider.
+
+`~/src/components/cart.js`
+
+```diff
+- import mint from 'state-mint'
++ import mint from '~/src/stores'
+
+export default mint(({ $: { cart } }) => {
+
+  const { items } = cart.state
+  	
+  return (
+    <div>
+      {
+        items.map((item) => (
+          <div className='cart-item'>
+            <img src={ item.thumbnail } />
+            <h3>{ item.name }</h3>
+            <p>{ item.description }</p>
+            <h5>{ item.price }</h5>
+          </div>
+        ))
+      }
+    </div>
+  )
+  
+})
+```
+
+Some projects are large and unweildy, any can make use of multiple providers as a way of further scoping (and stabilizing) their data flows. Let's break the example above into two providers:
+
+`~/src/stores/index.js`
+
+```js
+import { provide } from 'state-mint'
+
+import Auth from './Auth'
+import Feed from './Feed'
+
+import Cart from './Cart'
+import Analytics from './Analytics'
+
+export const authAndFeedMint = provide({
+  auth: Auth,
+  feed: Feed,
+})
+
+export const cartAndAnalyticsMint = mint({
+  cart: Cart,
+  analytics: Analytics,
+})
+```
+
+## Future direction
 
 
 ## FAQ
@@ -602,7 +717,7 @@ Now, when you use the Counter component, the constructor and componentDidMount h
 **A)** Before `mint` constructors your store, the `setState` method is attached to the class prototype (precompiled, it defines a new class that extends yours). Although your class doesn't have a setState method upon its initial definition, it will upon runtime.
 
 **Q)** Why doesn't it use React's Context API?<br />
-**A)** While React@^16.3 Context is polyfilled for older versions or react, I wanted State Mint to work without the version or peer dependency. Plus, using React Context would be overkill. Context Providers rerender all children upon any state change (no faster paints). By saving a given store's subscriber components' references, the door is open to more customization of behavior.
+**A)** While React@^16.3 Context can be [polyfilled](https://github.com/jamiebuilds/create-react-context) for older versions of react, I wanted State Mint to work without the React version or polyfill package dependency. Plus, using React Context would be overkill; Context Providers rerender all children upon any state change, which leads to a lot of unecessary rerendering. By saving a given store's subscriber components' references, the door is open to more customization of behavior.
 
 ## LICENSE
 

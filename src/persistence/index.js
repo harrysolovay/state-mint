@@ -14,7 +14,7 @@ export default (store, key) => {
 
   error(noConfig && IN_NATIVE, MISSING_PERSIST_STRATEGY, key)
 
-  const strategy = noConfig
+  const strategy = noConfig || !persistence.strategy
     ? window.localStorage
     : persistence.strategy
 
