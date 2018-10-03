@@ -433,7 +433,7 @@ export default class Counter {
 To use AsyncStorage or SecureStore (React Native only), you'll need to first import the storage provider:
 
 ```diff
-import { AsyncStorage } from 'react-native'
++ import { AsyncStorage } from 'react-native'
 
 export default class Counter {
 
@@ -553,14 +553,12 @@ export default class SomeToggle {
 
 ## Lifecycle hooks
 
-State Mint makes use of the [higher-order component (HOC) pattern](https://reactjs.org/docs/higher-order-components.html) for which the React team advocates.
+State Mint makes use of the [higher-order component (HOC) pattern](https://reactjs.org/docs/higher-order-components.html) for which the React team advocates. Because of the use of stateful HOCs, there's little reason to define your wrapped component as also stateful. Instead, boost performance by using using minted stores (instead of local state) and adding lifecycle hooks as a static property of your (newly) functional component.
 
 <details>
 <summary>architectural sidenote</summary>
 For the time being, using HOCs seems to be the safest way to compose user-defined components that access a state-dependent assortment of stores and settings. However, in my experimentation, I did find another pattern which performs better for the wrapping of stateful components: the wrapping function could extend a new class with the user-defined component (which extends React.Component). Inside of this newly-generated class, ES6 symbols would be used to mask private properties of the wrapper. This way, there's no overriding of props.
 </details>
-
-Because of the use of stateful HOCs, there's little reason to define your wrapped component as also stateful. Instead, boost performance by using using minted stores (instead of local state) and adding lifecycle hooks as a static property of your (newly) functional component:
 
 ```jsx
 import mint from 'state-mint'
