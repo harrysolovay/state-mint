@@ -146,7 +146,7 @@ render(<ConnectedModal />, document.getElementById('root'))
 npm i state-mint
 ```
 
-#### [unpkg](https://unpkg.com/state-mint)
+#### [Unpkg](https://unpkg.com/state-mint)
 
 ```html
 <!-- loads minified UMD build -->
