@@ -646,13 +646,12 @@ Counter.lifeCycleHooks = ({ $ }) => ({
 
 export default mint(Counter)
 ```
-<br />
 
 <details>
 <summary>architectural sidenote</summary>
-For the time being, using HOCs seems to be the safest way to compose user-defined components with a library-defined component (consumer-specific settings and rerender trigger). However, in my experimentation, I did find another pattern which performs better for the creation of store-consuming components: the component "minter" could extend a new class with the user-defined component (which extends React.Component). Inside of this newly-generated class, ES6 symbols would be used to mask private properties of the wrapper. This way, there's no overriding of props. Although I see no pitfalls, this is advised against. That advisement most likely has to do with the fact that synthetic inheritence shards a few levels deep. Best not to confuse JavaScript with fully-object-oriented languages.
+For the time being, using HOCs seems to be the safest way to compose user-defined components with a stateful library-defined component (stateful for the sake of its rerender trigger and the tracking of consumer-specific settings). However, in my experimentation, I did find another pattern which performs better for the creation of store-consuming components (and the execution of lifecycle methods): the component "minter" could extend a new class with the user-defined component (which extends React.Component). Inside of this newly-generated class, ES6 symbols would be used to mask private properties of the wrapper. This way, there's no overriding of props. Although I see no pitfalls, this is advised against. That advisement most likely has to do with the fact that synthetic inheritence performance shards a few levels deep (babel doesn't precompile into new constructors, it precompiles into dynamic prototype assignments)... best not to confuse JavaScript with fully-object-oriented languages.
 </details>
-
+<br />
 Now, when you use the Counter component, the constructor and componentDidMount hooks will be triggered from the stateful component in which it is contained.
 
 ### Provide
