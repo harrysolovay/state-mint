@@ -46,7 +46,7 @@
 <hr />
 
 > **A state layer that keeps your React project fresh 🌿**
-> Designed for React developers, State Mint is a boilerplate-free state management and persistence solution with spectacular performance and the best-available developer experience. Click [here](https://reactjs.org/docs/render-props.html) to read about the process of creating State Mint, and about its future direction (feel free to PR).
+> Designed for React developers, State Mint is a boilerplate-free state management and persistence solution with spectacular performance and developer experience.
 
 <details>
 <summary>view minimal example implementation</summary>
@@ -138,13 +138,13 @@ render(<ConnectedModal />, document.getElementById('root'))
 
 ## Installation
 
-#### available through the NPM registry
+### available through the NPM registry
 
 ```sh
 yarn add state-mint
 ```
 
-#### build formats
+### build formats
 
 ES Module
 
@@ -260,7 +260,7 @@ Before React came onto the scene, global state management was, for many projects
 
 ## Minting
 
-### the thinking behind the name
+### the thinking behind the term
 
 The name was selected as it relates to the idea of an industrial facility that manufactures coins
 > "Mint: a place where money is coined, especially under state authority" (dictionary.com)
@@ -269,7 +269,7 @@ While it is a nice play on words (especially relating to React.setState), the te
 
 ### minting stores
 
-Stores are defined as ES6 classes, and then "minted" with the default-exported function of the `state-mint` package. By passing your stores to that `mint` function, the stores get extended with the setState method, along with performance enhancements, persistence features, and more. The extended class is then instanciated and placed appropriately within a scope that can only be accessed by minting a component. This prevents accidental overwrites and other conflicts.
+Stores are defined as ES6 classes, and then "minted" with the default-exported function of the `state-mint` package. By passing your stores to that `mint` function, the stores get extended with the setState method, along with performance enhancements, persistence features, and more. The extended class is then instanciated and placed appropriately within a scope that can only be accessed by a minted component. This prevents accidental overwrites and other conflicts.
 
 ```js
 import mint from 'state-mint'
