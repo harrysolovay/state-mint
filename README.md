@@ -257,15 +257,14 @@ Before React came onto the scene, global state management was, for many projects
 
 ## Minting
 
-#### the thinking behind the name
+### the thinking behind the name
 
 The name was selected as it relates to the idea of an industrial facility that manufactures coins
-> "Mint: a place where money is coined, especially under state authority"
-> • dictionary.com
+> "Mint: a place where money is coined, especially under state authority" (dictionary.com)
 
 While it is a nice play on words (especially relating to React.setState), the term "mint" also suggests something to the effect of governing (digital) assets. All-in-all, I believe it's a good fit for this library, and could be adopted by others as a term for describing the instanciation of data stores.
 
-#### minting stores
+### minting stores
 
 Stores are defined as ES6 classes, and then "minted" with the default-exported function of the `state-mint` package. By passing your stores to that `mint` function, the stores get extended with the setState method, along with performance enhancements, persistence features, and more. The extended class is then instanciated and placed appropriately within a scope that can only be accessed by minting a component. This prevents accidental overwrites and other conflicts.
 
@@ -281,7 +280,7 @@ class MyStore {
 mint({ my: MyStore })
 ```
 
-#### minting components
+### minting components
 
 You can connect any component to store(s) data by simply wrapping the component in the same `mint` function as before. In minting a component, State Mint will inspect which stores the component (including lifecycle methods) reference. This feature is called 'subscription inference.' When a given store's state is updated, its subscribed components are rerendered.
 
@@ -298,7 +297,7 @@ const Whos = mint((props) => {
 })
 ```
 
-#### switching up the order
+### switching up the order
 
 Subscription inference will work, even if you define a store after instanciating a component that uses the store's data. A simple `if (props.$.storeName)` in your component will safeguard against errors that come about from the store being undefined. Once the store is defined, the component will be subscribed to it, and will rerender with the store data. In other words, you don't need to mint any stores in order to mint a component.
 
@@ -324,11 +323,11 @@ class MyStore = {
 mint({ my: MyStore })
 ```
 
-### subscriptions
+## subscriptions
 
 There are two ways to subscribe (connect) components with State Mint. In either case, subscribing a component to a store will do two things: (1) it will make the store's data accessible through props with a key of `$` (`props.$`) and (2) it will rerender the component upon any changes to the state of stores to which the component is subscribed.
 
-#### manual assignment
+### manual assignment
 
 The first way to subscribe a component to a store is to mint the store with a second argument, an array of store keys. For instance:
 
@@ -342,7 +341,7 @@ const Header = mint((props) => (
 ), ['header'])
 ```
 
-#### subscription inference
+### subscription inference
 
 In the vast majority of use cases, subscription inference will work equally-well. The underlaying operations involve converting your component and any lifecycle methods or hooks to strings, and and then parsing out whether a given store is referenced. Don't worry about the effects of destructuring or other syntactical abstractions of the reference.
 
@@ -356,7 +355,7 @@ const Header = mint((props) => (
 ))
 ```
 
-#### managing an instance's subscription
+### managing an instance's subscription
 
 Let's say you want to subscribe or unsubscribe a component that's already been instanciated:
 
@@ -375,6 +374,8 @@ const Countdown = mint((props) => {
 ```
 
 ## Persistence
+
+### Default settings
 
 By default, persistence is disabled. To enable persistence without configuration, simply set an instance variable `persist` to `true`. Every time the state changes, it will be persisted with localStorage (set strategy in React Native).
 
@@ -397,6 +398,8 @@ export default class Counter {
 
 }
 ```
+
+### Custom strategy
 
 To use another persist strategy, set persist to an object containing a `strategy` prop. Assign `strategy` to the strategy you wish to use (current options: localStorage, sessionStorage, document.cookie, AsyncStorage, and SecureStore).
 
@@ -421,6 +424,8 @@ export default class Counter {
 
 }
 ```
+
+### React Native
 
 To use AsyncStorage or SecureStore (React Native only), you'll need to first import the storage provider:
 
@@ -447,6 +452,8 @@ export default class Counter {
 
 }
 ```
+
+### Specify what data to persist
 
 We don't always want to persist the entire state, and sometimes we want to persist data outside of state (instance variables). Be careful though, persisting functions will result in an error (as they cannot be converted to JSON).
 
@@ -506,6 +513,8 @@ export default class Account {
 
 }
 ```
+
+### manually trigger a persistent save
 
 Often times, you'll want to persist your data independent of state, or application memory for that matter. By defining fromStore & toStore, you can establish the flow of data in and out of persistent storage. From this flow, State Mint checks to see if persistent storage references state at all. If it does, then calling setState will trigger a persistent save. Otherwise, setState will leave persistent storage untouched. Aka., you can stop using setState if the only class features you're using are instance variables and State Mint's persistence; manually trigger a persistent save by calling `this.persist` with no arguments from within your store class. It won't trigger a re-render, but it will save the data to your chosen or the default strategy.
 
