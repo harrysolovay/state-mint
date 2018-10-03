@@ -94,6 +94,7 @@ export default (...args) => {
         if (!e) condition = false
         e = args.shift()
       }
+      
       message = errors[e]
         ? errors[e](...args)
         : e

@@ -3,9 +3,9 @@
 </div>
 
 
-<!--<h1 align='center'>
-  <img src='logo.png' alt='State Mint' />
-</h1>-->
+<h1 align='center'>
+  <img src='banner.png' alt='Mint People' />
+</h1>
 
 
 <!-- LICENSE -->
