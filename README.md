@@ -656,7 +656,7 @@ Now, when you use the Counter component, the constructor and componentDidMount h
 
 ### Provide
 
-Although left unhighlighted for the sake of simplicity, the `state-mint` package does have a named export `provide`, which allows you to create a new `minter` (new stores scope). It's useful to think about this using classical state management terms such as provider and consumer. Until this point in the documentation, the line between provider and consumer is blurry; the default-exported function has been used both to initialize stores and to connect components to those stores. This is incredibly useful in lowering the learning curve, but it doesn't result in awareness of a more advanced and potentially (depending on your project) deliberate pattern: instead of importing the default export (a pre-initialized provider), import the named export `provide`, which allows you to initialize your own providers:
+Although left unhighlighted for the sake of simplicity, the `state-mint` package does have a named export `provide`, which allows you to create a new `minter` (new stores scope). It's useful to think about this using common state management terms such as provider and consumer. Until this point in the documentation, the line between provider and consumer is blurry; the default-exported function has been used both to initialize stores and to connect components to those stores. This is incredibly useful in lowering the learning curve, but it doesn't result in awareness of a more advanced and potentially (depending on your project) deliberate pattern: instead of importing the default export (a pre-initialized provider), import the named export `provide`, which allows you to initialize your own providers:
 
 `~/src/stores/index.js`
 
