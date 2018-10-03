@@ -38,7 +38,7 @@
 
 <!-- gzipped -->
 <a href='https://unpkg.com/state-mint/lib/'>
-  <img src='http://img.badgesize.io/https://unpkg.com/state-mint/lib/state-mint.min.js?compression=gzip&label=gzip%20size&style=flat-square' />
+  <img src='http://img.badgesize.io/https://unpkg.com/state-mint@0.1.3/lib/state-mint.min.js?compression=gzip&label=gzip%20size&style=flat-square' />
 </a>
 
 </p>
