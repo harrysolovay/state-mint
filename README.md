@@ -126,9 +126,12 @@ render(<ConnectedModal />, document.getElementById('root'))
 - [Installation](#installation)
 - [Quick Start](#quick-start)
 - [Why?](#why)
-- [Intro](#intro)
-- [Usage](#usage)
-- [FAQ (or infrequently / never yet asked)](#faq-or-infrequently--never-yet-asked)
+- [Overview](#overview)
+- [Minting](#minting)
+- [Subscriptions](#subscriptions)
+- [Persistence](#persistence)
+- [Lifecycle hooks](#lifecycle-hooks)
+- [FAQ](#faq)
 - [LICENSE](#license)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -245,7 +248,7 @@ Before React came onto the scene, global state management was, for many projects
 
 ***[Unstated](https://unstated.io):*** as far as alternatives go, Unstated is the least opinionated with the lowest learning curve. The underlaying mechanism is pretty cool: behind the scenes, stores are initialized inside a Consumer, which then passes the store data to its parent provider, which then passes the data to all store Consumers. This pattern is cool, but a little hackey, and results in extra operations with each update. It also means you need to use the Store contructor as a key to the instance, (no support for multiple instances of the same Store). Another disadvantage is that data can only be accessed within a render method (aka. no store usage in lifecycle methods) without a user-defined HOC. Plus, using the ContextAPI means that any operation that updates the state of any store will trigger a re-render of all mounted "connected" components.
 
-## overview
+## Overview
 
 1. Define your stores as ES6 classes and use `state` and `setState` just as you would when extending React.Component. For all intensive purposes, there's no difference in their usage.
 
@@ -323,7 +326,7 @@ class MyStore = {
 mint({ my: MyStore })
 ```
 
-## subscriptions
+## Subscriptions
 
 There are two ways to subscribe (connect) components with State Mint. In either case, subscribing a component to a store will do two things: (1) it will make the store's data accessible through props with a key of `$` (`props.$`) and (2) it will rerender the component upon any changes to the state of stores to which the component is subscribed.
 
