@@ -249,7 +249,7 @@ Before React came onto the scene, global state management was, for many projects
 
 1. Define your stores as ES6 classes and use `state` and `setState` just as you would when extending React.Component. For all intensive purposes, there's no difference in their usage.
 
-2. Import the `mint` function from the `state-mint` package, and call it with an object that has your Store class constructors as the values (🗝️ key them however you'd like to later reference the instance).
+2. Import the `mint` function from the `state-mint` package, and call it with an object that has your Store class constructors as the values (key them however you'd like to later reference the instance).
 
 3. Use the `mint` function again to wrap your components, thereby subscribing them to the stores they reference.
 
@@ -261,8 +261,7 @@ Before React came onto the scene, global state management was, for many projects
 
 The name was selected as it relates to the idea of an industrial facility that manufactures coins
 > "Mint: a place where money is coined, especially under state authority"
->
-> - dictionary.com
+> • dictionary.com
 
 While it is a nice play on words (especially relating to React.setState), the term "mint" also suggests something to the effect of governing (digital) assets. All-in-all, I believe it's a good fit for this library, and could be adopted by others as a term for describing the instanciation of data stores.
 
