@@ -1,9 +1,12 @@
-import React, { Component } from 'react'
+import React, {
+  Component,
+} from 'react'
 import {
   isStatefulComponent,
   isFunctionalComponent,
   getStoreSubgroup,
   noop,
+  createUniqueId,
 } from '~/utilities'
 import error, {
   LIFECYCLE_HOOKS_ON_STATEFUL,
@@ -124,22 +127,14 @@ export default (stores, consumers, Target, keys) => {
       }
     }
 
-    onNewStore = () => {
-      const { mounted, subscriptions } = this
-      if (mounted && !keys && subscriptions) {
-        const { subscribe, rerender } = this
-        subscribe()
-        subscriptions !== this.subscriptions &&
-          rerender()
-      }
-    }
-
     constructor(props) {
       super()
 
       let { $ } = props
       error(!!$, OVERRIDING_$_PROP)
 
+      this._key = createUniqueId()
+      this.staticSubscriptions = keys
       this.subscribe()
 
       const { lifeCycleHooks } = Target

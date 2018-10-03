@@ -7,5 +7,8 @@ import Hello from './Hello'
 mint({
   account: Account,
   counter: Counter,
-  hello: Hello,
 })
+
+setTimeout(() => {
+  mint({ hello: Hello })
+}, 1000)

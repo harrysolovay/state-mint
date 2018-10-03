@@ -4,7 +4,7 @@ import error, {
   MISSING_FROM_STORE,
 } from '~/errors'
 import { IN_NATIVE } from '~/utilities'
-import getMethods from './getMethods'
+import getPersistMethods from './methods'
 
 export default (store, key) => {
 
@@ -25,13 +25,13 @@ export default (store, key) => {
     error(!!toStore, MISSING_FROM_STORE, key)
   }
 
-  const { get, set } = getMethods(strategy, options, key)
+  const { get, set } = getPersistMethods(strategy, options, key)
 
   store.persist = Object.assign(() => {
     set( key,
       fromStore
         ? fromStore()
-        : { ...store.state },
+        : store.state,
     )
   }, {
     _referencesState: (

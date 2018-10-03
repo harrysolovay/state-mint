@@ -1,4 +1,6 @@
-import error, { STORE_KEY_ALREADY_EXISTS } from '~/errors'
+import error, {
+  STORE_KEY_ALREADY_EXISTS,
+} from '~/errors'
 import setPersistence from '~/persistence'
 
 export default (stores, consumers, config) => {
@@ -74,7 +76,20 @@ export default (stores, consumers, config) => {
 
       if (consumers.length >= 1) {
         for (let consumer of consumers) {
-          consumer.onNewStore()
+
+          const {
+            mounted,
+            staticSubscriptions,
+            subscriptions,
+          } = consumer
+
+          if (!staticSubscriptions && subscriptions) {
+            const { subscribe, rerender } = consumer
+            subscribe()
+            subscriptions !== consumer.subscriptions && mounted &&
+              rerender()
+          }
+
         }
       }
     }

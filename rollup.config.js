@@ -8,16 +8,14 @@ import { uglify } from 'rollup-plugin-uglify'
 const input = 'src/index.js'
 
 const external = [
-  ...Object.keys(pkg.dependencies || {}),
-  ...Object.keys(pkg.peerDependencies || {}),
-  // suppress `babel-runtime`-related errors
+  'react',
+  '@babel/runtime/helpers/extends',
+  '@babel/runtime/regenerator',
+  '@babel/runtime/helpers/asyncToGenerator',
   '@babel/runtime/helpers/inheritsLoose',
   '@babel/runtime/helpers/assertThisInitialized',
   '@babel/runtime/helpers/defineProperty',
-  '@babel/runtime/helpers/extends',
   '@babel/runtime/helpers/wrapNativeSuper',
-  '@babel/runtime/regenerator',
-  '@babel/runtime/helpers/asyncToGenerator',
 ]
 
 const babelOptions = {

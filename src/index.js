@@ -5,7 +5,10 @@ import error, {
   INVALID_MINT_ARGS,
 } from '~/errors'
 import instantiate from './instantiate'
-import { isComponent, isConfig } from '~/utilities'
+import {
+  isComponent,
+  isConfig,
+} from '~/utilities'
 import wrap from './wrap'
 
 const provide = (config, ...args) => {

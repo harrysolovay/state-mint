@@ -2,7 +2,7 @@
   "name": "state-mint",
   "description": "an intuitive, expressive API for React state management & persistence",
   "author": "Harry Solovay <harrysolovay@gmail.com> (harrysolovay.com)",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "license": "MIT",
   "main": "lib/state-mint.cjs.js",
   "unpkg": "lib/state-mint.umd.js",

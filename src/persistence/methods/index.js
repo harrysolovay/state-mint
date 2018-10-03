@@ -1,7 +1,9 @@
 import storage from './storage'
 import asyncStorage from './asyncStorage'
 import secureStore from './secureStore'
-import error, { INVALID_PERSIST_STRATEGY } from '~/errors'
+import error, {
+  INVALID_PERSIST_STRATEGY,
+} from '~/errors'
 import cookie from './cookie'
 
 
