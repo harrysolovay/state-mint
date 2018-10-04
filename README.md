@@ -116,8 +116,6 @@ render(<ConnectedModal />, document.getElementById('root'))
 
 - 🍻 plays nice with older versions React
 
-- 🔐 *(give me until October 4th)* Flow & TypeScript typings
-
 ## Guide
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
@@ -543,7 +541,7 @@ export default class Account {
 +     return user
 +   },
 
-    // when persisted data gets retrieved, place it where it goes
+    // when persisted data gets retrieved, place it where it's supposed to go
 +   toStore: (persistedData) => {
 +     this.setState((lastState) => ({
 +       ...lastState,
@@ -653,7 +651,7 @@ For the time being, using HOCs seems to be the safest way to compose user-define
 <br />
 Now, when you use the Counter component, the constructor and componentDidMount hooks will be triggered from the stateful component in which it is contained.
 
-### Provide
+## Provide
 
 Although left unhighlighted for the sake of simplicity, the `state-mint` package does have a named export `provide`, which allows you to create a new `minter` (new stores scope). It's useful to think about this with common state management terms (such as "provider" and "consumer"). Until this point in the documentation, the line between provider and consumer is blurry; the default-exported function has been used both to initialize stores and to connect components to those stores. This is incredibly useful in lowering the learning curve, but it doesn't result in awareness of a more advanced and potentially (depending on your project) deliberate pattern: instead of importing the default export (a pre-initialized provider), import the named export `provide`, which allows you to initialize your own providers:
 
